@@ -1,0 +1,40 @@
+
+<p-multiSelect [options]="params" [group]="group" [(ngModel)]="value" (onChange)="log($event); onChange($event)"
+               scrollHeight="250px" #mltselect [placeholder]="placeholder"
+               display="chip" dropdownIcon="''" [filterPlaceHolder]="placeholder"
+               [styleClass]="label.length == 0 ? 'auto-height' : ''"
+               [appendTo]="appendTo" [defaultLabel]="label" [showToggleAll]="showToggleAll"
+               [panelStyleClass]="'multiselect-panel' + (mltselect._filterValue && mltselect._filterValue.length > 0 ? ' withoutSearch' : '') +
+                                   (showHeader ? '' : ' withoutHeader ')"
+               [filter]="filter" [showHeader]="showHeader" optionValue="code"
+>
+    <ng-template let-tags pTemplate="selectedItems">
+        <div *ngIf="label.length > 0 ">{{label}}</div>
+        <div *ngIf="label.length == 0 &&  value.length == 0" class="placeholder">{{placeholder}}</div>
+        <div #token *ngFor="let item of value; let i = index;" class="p-multiselect-token">
+            <span class="p-multiselect-token-label">{{mltselect.findLabelByValue(item) }} {{getLabel(item, mltselect)}}</span>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+        <span class="filter-clear pi pi-times" (click)="mltselect._filterValue = ''; mltselect.activateFilter()"></span>
+        <span *ngIf="headerText" class="header-text">{{headerText}}</span>
+    </ng-template>
+    <ng-template let-group pTemplate="group">
+        <span class="group-header">
+<!--                <div class="p-checkbox p-component">-->
+<!--                    <div class="p-checkbox-box" [ngClass]="{'p-highlight': true}">-->
+<!--                        <span class="p-checkbox-icon" [ngClass]="{'pi pi-check': true}"></span>-->
+<!--                    </div>-->
+<!--                </div>-->
+            {{group.label}} <span *ngIf="withAdd" class="add-button" (click)="add(group)">Создать</span>
+        </span>
+        <span *ngIf="group.items == 0" class="no-found">
+             <div class="p-checkbox p-component">
+                <div class="p-checkbox-box" [ngClass]="{'p-highlight': true}">
+                    <span class="p-checkbox-icon" [ngClass]="{'pi pi-check': true}"></span>
+                </div>
+            </div>Записей не найдено</span>
+    </ng-template>
+</p-multiSelect>
+

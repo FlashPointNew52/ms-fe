@@ -1,0 +1,245 @@
+<div class="head">
+    <span>Контакты</span>
+    <p-selectButton [options]="[
+                                {label: 'Таблица', value: 'table'},
+                                {label: 'Доска', value: 'board'},
+                                {label: 'Статистика', value: 'statistics'}
+                    ]"
+                    [(ngModel)]="mode" styleClass="head-button"
+                    optionLabel="label" optionValue="value"
+    ></p-selectButton>
+</div>
+<hr class='underline'>
+<hr class='underline progress_bar' [ngStyle]="{'width': 0 + 'vw', 'transition': 0 > 0 ? 'all 2s ease 0s' : 'all 0s ease 0s'}">
+<div class="work-area">
+    <div class="main-bottoms">
+        <div #sectionSelector class="section">
+            <app-dropdown [options]="[
+                    {label: 'Без взаимодействия', code: 'EMPTY'},
+                    {label: 'Активно', code: 'ACTIVE'},
+                    {label: 'Приостановлено', code: 'SUSPENDED'},
+                    {label: 'Архив', code: 'ARCHIVE'},
+                    {label: 'Корзина', code: 'TRASH'},
+                    {label: 'Другое', code: 'OTHER'}
+                ]" [(ngModel)]="filter.stateCode" (ngModelChange)="list()"
+            ></app-dropdown>
+        </div>
+
+        <button pButton type="button" label="Настройка колонок" class="p-button-outlined" (click)="sidebar = 1"></button>
+        <button pButton type="button" label="Фильтры" class="p-button-outlined" (click)="sidebar = 2"></button>
+        <button pButton type="button" label="Создать контакт" class="p-button-green" (click)="createContact()"></button>
+    </div>
+
+    <div class="blocks">
+        <div>Общая информация<span>50</span></div>
+        <div>Контактная деятельность<span>50</span></div>
+        <div>Общение<span>50</span></div>
+        <div>Всего моих конктов<span>50</span></div>
+    </div>
+
+    <p-sidebar [visible]="sidebar > 0" position="right" [modal]=false [baseZIndex]="8500" (onHide)="sidebar = 0" styleClass="tab-sidebar">
+        <div class="sidebar-header" [ngSwitch]="sidebar">
+            <span *ngSwitchCase="3">Быстрый просмотр</span>
+            <span *ngSwitchDefault>{{sidebar == 1 ? "Настройка колонок таблицы" : "Фильтры" }}</span>
+        </div>
+        <p-tabView [activeIndex]="2" styleClass="tabView" *ngIf="sidebar < 3">
+            <ng-container *ngIf="sidebar == 1">
+                <p-tabPanel header="Колонки" [selected]="true">
+                    <div class="description-text">Выбирайте колонки в порядке приоритетности, тогда они отобразятся в нужной Вам последовательности.​</div>
+                    <app-listbox [options]="columnList" [(value)]="activeColumns"></app-listbox>
+                </p-tabPanel>
+                <p-tabPanel header="Пресеты">
+                    <div class="description-text">Пресет - это предустановленные значения, созданные пользователем системы и служащие для удобства работы.</div>
+                    <div class="no-data">У Вас пока нет созданных пресетов. Создавайте пресеты и используйте их для работы с таблицей.</div>
+                    <div class="save-buttons">
+                        <button pButton type="button" label="Создать" class="p-button-green" (click)="show('Новый пресет',{})"></button>
+                        <button pButton type="button" label="Редактировать" class="p-button-outlined"></button>
+                        <button pButton type="button" label="Удалить" class="p-button-outlined"></button>
+                    </div>
+                </p-tabPanel>
+            </ng-container>
+            <ng-container *ngIf="sidebar == 2">
+                <p-tabPanel header="Фильтры">
+                    <div class="description-text">Выбирайте колонки в порядке приоритетности, тогда они отобразятся в нужной Вам последовательности.​</div>
+                    <app-listbox></app-listbox>
+                </p-tabPanel>
+                <p-tabPanel header="Пресеты">
+                    <div class="description-text">Пресет - это предустановленные значения, созданные пользователем системы и служащие для удобства работы.</div>
+                    <div class="no-data">У Вас пока нет созданных пресетов. Создавайте пресеты и используйте их для работы с таблицей.</div>
+                    <div class="save-buttons">
+                        <button pButton type="button" label="Создать" class="p-button-green" (click)="show('Новый пресет',{})"></button>
+                        <button pButton type="button" label="Редактировать" class="p-button-outlined"></button>
+                        <button pButton type="button" label="Удалить" class="p-button-outlined"></button>
+                    </div>
+                </p-tabPanel>
+
+<!--                <p-pickList [source]="columnList">-->
+<!--                    <ng-template let-car pTemplate="item">-->
+<!--                    </ng-template>-->
+<!--                </p-pickList>-->
+            </ng-container>
+
+        </p-tabView>
+        <app-entity-view [entity]="previewEntity" (entityChanges)="updateEntity(previewEntity, $event)" *ngIf="sidebar == 3"
+                         (deleteChanges)="delete($event); previewEntity = null; sidebar = -1"
+                         [fullSaveBar]="false" [service]="entityService" tieredClass="left-position"
+        ></app-entity-view>
+    </p-sidebar>
+
+    <p-sidebar [visible]="headerOverlay != null"  position="right" [modal]="true" [baseZIndex]="8500" (onHide)="headerOverlay = null"
+               [styleClass]="'extended'"
+    >
+        <div class="sidebar-header">
+            <span>{{ headerOverlay?.label }}</span>
+        </div>
+    </p-sidebar>
+    <ng-container *ngIf="activeColumns.length > 0 else noColumns">
+        <p-table [value]="entities" [(selection)]="selectedEntity" dataKey="id" [columns]="activeColumns" #table selectionMode="multiple"
+        >
+            <ng-template pTemplate="colgroup" let-columns #group>
+                <colgroup>
+                    <col style="width:60px">
+                    <col *ngFor="let col of columns" style="width:280px">
+                </colgroup>
+            </ng-template>
+            <ng-template pTemplate="header" let-columns>
+                <tr class="t-header">
+                    <th [class.context]="selectedEntity.length > 0">
+                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                    </th>
+                    <ng-container *ngIf="selectedEntity.length == 0">
+                        <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                            {{col.header}}<p-sortIcon [field]="col.field"></p-sortIcon>
+                        </th>
+                    </ng-container>
+                    <ng-container *ngIf="selectedEntity.length > 0">
+                        <th [attr.colspan]="columns.length" class="context">
+                            <p-menubar *ngIf="(headerMenu | slice:0:4) as mainMenu" [model]="mainMenu">
+                                <ng-template pTemplate="start">
+                                    <span>Выбрано<span>{{selectedEntity.length }} контактов</span></span>
+                                    <hr>
+                                </ng-template>
+                                <ng-template pTemplate="end">
+                                    <ng-container *ngFor="let item of (headerMenu | slice:4)">
+                                        <div [ngSwitch]="item.value">
+                                            <app-dropdown-tag [ngModel]="selectedTags" [onlyDropdown]="true" [appendTo]="table" *ngSwitchCase="'markTag'"
+                                                              label="Теги"
+                                            ></app-dropdown-tag>
+                                            <app-multiselect *ngSwitchCase="'assignTo'" [onlyDropdown]="true" [appendTo]="table"
+                                                             [label]="'Назначить на ...'" [showToggleAll]="false"
+                                                             [ngModel]="[]"
+                                                             placeholder="Поиск по всем записям ..."
+                                                             [params]="item.submenu"
+                                            ></app-multiselect>
+                                            <app-multiselect *ngSwitchCase="'addTo'" [onlyDropdown]="true" [appendTo]="table"
+                                                             [label]="'Добавить в ...'" [showToggleAll]="false"
+                                                             [ngModel]="[]"
+                                                             placeholder="Поиск группы, списка ..." [withAdd]="true"
+                                                             [params]="item.submenu"
+                                            ></app-multiselect>
+                                            <app-multiselect *ngSwitchCase="'subscribeTo'" [onlyDropdown]="true" [appendTo]="table" [group]="false"
+                                                             [label]="'Подписаться на ...'" [showToggleAll]="false"
+                                                             [ngModel]="[]" [filter]="false" [showHeader]="false"
+                                                             [params]="item.submenu"
+                                            ></app-multiselect>
+                                        </div>
+                                    </ng-container>
+                                </ng-template>
+                            </p-menubar>
+
+                            <p-overlayPanel #context [appendTo]="table" [dismissable]="false">
+                                <ng-template pTemplate>
+                                    <div class="head">{{headerOverlay.label}}</div>
+                                    <div class="button-list">
+                                        <button pButton type="button" label="Отмена" class="p-button-outlined"></button>
+                                        <button pButton type="button" label="Сохранить" class="p-button-outlined"></button>
+                                        <button pButton type="button" label="Закрыть" class="p-button-outlined" (click)="context.hide()"></button>
+                                    </div>
+                                </ng-template>
+                            </p-overlayPanel>
+                        </th>
+                    </ng-container>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-entity let-rowIndex="rowIndex" let-columns="columns">
+                <tr [pSelectableRow]="entity" [pSelectableRowIndex]="rowIndex" >
+                    <td>
+                        <p-tableCheckbox [value]="entity" (click)="$event.stopPropagation()"></p-tableCheckbox>
+                    </td>
+                    <ng-container *ngFor="let col of columns; let i = index" [ngSwitch]="col.field" >
+                        <td *ngSwitchCase="'name'" class="name">
+                            <div>
+                                <p-avatar image="assets/temp/person.jfif" shape="circle"></p-avatar>
+                                <div class="name-text"
+                                     (dblclick)="openTab(entity.lastName +  ' ' + entity.name, 'PERSON', {entity: entity})"
+                                     (click)="$event.preventDefault(); $event.stopPropagation();"
+                                >
+                                    <span>{{entity.lastName}}</span>
+                                    {{entity.name}}
+                                </div>
+                                <div class="tooltip">
+                                    <span class="p-buttonset">
+                                        <button pButton pRipple label="Перейти в карточку" (click)="openTab(entity.lastName +  ' ' + entity.name, 'PERSON', {entity: entity})"></button>
+                                        <button pButton pRipple label="Быстрый просмотр" (click)="previewEntity = entity; sidebar = 3"></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td *ngSwitchCase="'tags'">
+                            <div>
+                                <app-tags-view [value]="entity.tag" *ngIf="entity.tag.length > 0"></app-tags-view>
+                            </div>
+
+                        </td>
+                        <td *ngSwitchCase="'phones'">
+                            <app-chips-view [value]="entity.phones" mask="+0 (000) 000-00-00" typeLink="tel:"
+                                            [items]="personClass.phoneTypeOptions"
+                            ></app-chips-view>
+                        </td>
+                        <td *ngSwitchCase="'emails'">
+                            <app-chips-view [value]="entity.emails" typeLink="mailto:"></app-chips-view>
+                        </td>
+                        <td *ngSwitchCase="'sites'">
+                            <app-chips-view [value]="entity.sites" typeLink="" targetLink="_blank"></app-chips-view>
+                        </td>
+                        <td *ngSwitchCase="'messengers'">
+                            <app-chips-view [value]="entity.messengers" mask="+0 (000) 000-00-00" typeLink="" targetLink="_blank"
+                                            [items]="{
+                                    WHATSAPP: {label: 'Whatsapp', text: 'Whatsapp', typeLink: 'https://wa.me/'},
+                                    VIBER: {label: 'Viber', text: 'Viber', typeLink: 'viber://contact?number='},
+                                    TELEGRAM: {label: 'Telegram', text: 'Telegram', typeLink: ''}
+                        }"
+                            ></app-chips-view>
+                        </td>
+                        <td *ngSwitchCase="'socials'">
+                            <app-chips-view [value]="entity.socials" typeLink="" targetLink="_blank"
+                                            [items]="{
+                                    VK: {label: 'Вконтакте', text: 'Вконтакте'},
+                                    OK: {label: 'Одноклассники', text: 'Одноклассники'},
+                                    FACEBOOK: {label: 'Facebook', text: 'Facebook'},
+                                    INSTAGRAM: {label: 'Instagram', text: 'Instagram'},
+                                    TWITTER: {label: 'Twitter', text: 'Twitter'}
+                                  }"
+                            ></app-chips-view>
+                        </td>
+                        <td *ngSwitchCase="'description'" class="text">
+                            <div>{{entity.description}}</div>
+                        </td>
+                        <td *ngSwitchCase="col.field === 'firstTask' || col.field === 'lastTask' || col.field === 'nextTask'
+                        || col.field === 'firstMeet' || col.field === 'lastMeet' || col.field === 'nextMeet' ? col.field : '' ">
+                            <app-task-view></app-task-view>
+                        </td>
+                        <td *ngSwitchCase="col.field === 'review' || col.field === 'note' ? col.field : '' ">
+                            <app-custom-view></app-custom-view>
+                        </td>
+                        <td class="text" *ngSwitchDefault>Здесь должны быть данные</td>
+                    </ng-container>
+                </tr>
+            </ng-template>
+        </p-table>
+    </ng-container>
+    <ng-template #noColumns>
+        <div class="no-columns">У вас нет выбранных колонок. Для добавления колонок воспользуйтесь настройкой колонок таблиц.</div>
+    </ng-template>
+</div>
+

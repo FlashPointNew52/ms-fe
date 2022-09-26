@@ -1,0 +1,17 @@
+<div>
+    <label>{{ isFind ? label : 'Поиск адреса' }}</label>
+    <app-search-panel *ngIf="!isFind" placeholder="Введите адрес в свободной форме ..." [(ngModel)]="address.oneLine"
+                      (ngModelChange)="setData($event)"
+                      field="name"
+                      [serviceData]="{
+                            serviceMethod: suggestionService.addressList,
+                            binder: suggestionService,
+                            displayField: displayFunc,
+                            params: [null, 'building', true]
+                      }">
+    </app-search-panel>
+    <div *ngIf="isFind">
+        <textarea [(ngModel)]="this.address.oneLine" pInputTextarea [autoResize]="true" rows="1" [disabled]="true"></textarea>
+        <i class="pi pi-times" (click)="setData(null)"></i>
+    </div>
+</div>

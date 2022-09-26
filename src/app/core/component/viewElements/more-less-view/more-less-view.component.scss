@@ -1,0 +1,25 @@
+@import "src/assets/styles/variables";
+
+.container{
+    overflow: hidden;
+}
+
+.chips-shower{
+    text-align: right;
+    color: $color-blue2;
+    cursor: pointer;
+    display: inline-flex;
+    width: 100%;
+    justify-content: end;
+    align-items: center;
+    margin: 14px 0 0;
+    font-size: 14px;
+    padding-right: 30px;
+
+    .pi{
+        font-size: 16px;
+        padding-right: 5px;
+        color: inherit;
+
+    }
+}

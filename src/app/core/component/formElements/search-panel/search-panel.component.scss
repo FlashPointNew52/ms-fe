@@ -1,0 +1,105 @@
+@import "src/assets/styles/variables";
+
+::ng-deep app-search-panel{
+    .p-input-icon-right {
+        width: 100%;
+
+
+        input{
+            @extend %input;
+
+            &:hover{
+                @extend %input-hover;
+            }
+
+            &:focus-visible{
+                @extend %input-focus;
+            }
+
+            &::placeholder{
+                color: $color-blue-light1;
+            }
+
+        }
+
+        .p-inputwrapper-filled input{
+            @extend %input-filled;
+        }
+
+        &:hover .p-inputwrapper-filled input{
+            @extend %input-hover;
+        }
+
+        &:focus-visible .p-inputwrapper-filled input{
+            @extend %input-focus;
+        }
+
+        &:hover .p-inputwrapper-filled + i{
+            display: block;
+        }
+
+        i{
+            @include times;
+        }
+    }
+
+    &.p-inputwrapper-filled {
+        .p-chips{
+            @extend %input-filled;
+
+
+        }
+    }
+
+    .p-autocomplete {
+        .p-autocomplete-panel{
+            @extend %panel;
+            margin-top: 0px;
+
+            .p-autocomplete-item{
+                padding: 0.5rem 25px;
+                color: $color-black;
+                font-size: $font-size-main;
+                line-height: initial;
+                white-space: normal;
+
+                &:not(.p-highlight):not(.p-disabled):hover, &.p-highlight:hover{
+                    background: $color-blue-light;
+                    color: $color-black;
+                }
+
+                &.p-highlight{
+                    background: none;
+                }
+
+                //&:hover{
+                //    background: $color-grey2;
+                //    color: inherit;
+                //}
+
+                span {
+                    white-space: normal;
+                }
+
+                mark{
+                    background: none;
+                    font-weight: bold;
+                    color: $color-black;
+                }
+            }
+        }
+
+        .p-autocomplete-loader{
+            display: none;
+        }
+    }
+
+    .p-inputtext{
+        padding-top: 10px;
+        padding-bottom: 1px;
+    }
+}
+
+
+
+

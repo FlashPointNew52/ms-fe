@@ -1,0 +1,87 @@
+@import "src/assets/styles/variables";
+
+::ng-deep app-listbox{
+
+    @include filter-header-clear(listbox);
+
+    .p-listbox{
+        border: none;
+
+        .p-listbox-header{
+            padding: 0 30px;
+            border-bottom: 0 none;
+            color: #495057;
+            background: white;
+            margin: 0;
+            border-top-right-radius: 3px;
+            border-top-left-radius: 3px;
+            position: relative;
+
+            .p-listbox-filter{
+
+                @extend %input;
+
+                &:hover{
+                    @extend %input-hover;
+                }
+
+                &:focus-visible{
+                    @extend %input-focus;
+                }
+
+                &::placeholder{
+                    color: $color-blue-light1;
+                }
+
+                &::placeholder{
+                    color: $color-blue-light1;
+                }
+            }
+
+            .p-listbox-filter-icon{
+                color: $color-blue-light1;
+                right: 10px;
+                top: 52%;
+            }
+        }
+
+        .p-listbox-list{
+            padding-top: 5px;
+
+            .p-listbox-item-group{
+                padding: 10px 30px;
+                color: $color-black-ever-lighter;
+                font-weight: bold;
+            }
+
+            .p-listbox-item{
+                padding: 5px 30px;
+                color: $color-black-ever-lighter;
+                height: 40px;
+
+                &:focus{
+                    box-shadow: none;
+                }
+
+                &:not(.p-highlight):not(.p-disabled):hover, &:hover{
+                    background: $color-blue-light;
+                    color: $color-blue-dark;
+                    @include checkbox-parent-hover;
+                }
+
+                &.p-highlight{
+                    color: $color-blue-dark;
+
+                    &:not(:hover){
+                        background: none;
+                    }
+
+                }
+            }
+        }
+    }
+
+
+}
+
+

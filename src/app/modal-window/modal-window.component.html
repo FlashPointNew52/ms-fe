@@ -1,0 +1,8 @@
+<p-dialog [(visible)]="message.text" [modal]="true" [style]="{width: '50vw'}" [baseZIndex]="10000"
+          [draggable]="false" [resizable]="false">
+    <p class="p-m-0">{{message.text}}</p>
+    <ng-template pTemplate="footer">
+        <p-button icon="pi pi-check" (click)="close()" label="Ок" class="p-button-text"></p-button>
+<!--        <p-button icon="pi pi-times" (click)="displayModal=false" label="No"></p-button>-->
+    </ng-template>
+</p-dialog>

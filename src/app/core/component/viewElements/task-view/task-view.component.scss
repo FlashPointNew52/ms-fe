@@ -1,0 +1,34 @@
+@import "src/assets/styles/variables";
+
+div:first-child{
+    color: $color-black-lighter;
+    margin-bottom: 8px;
+
+    span{
+        font-weight: normal;
+    }
+}
+
+div:nth-child(2){
+    font-weight: bold;
+    margin-bottom: 8px;
+    line-height: 16px;
+    color: $color-black;
+    span{
+        font-weight: normal;
+        margin-left: 5px;
+        color: $color-black;
+    }
+}
+
+div:last-child{
+    font-weight: bold;
+    line-height: 16px;
+    color: $color-black;
+
+    span{
+        color: $color-black;
+        font-weight: normal;
+        margin-left: 5px;
+    }
+}

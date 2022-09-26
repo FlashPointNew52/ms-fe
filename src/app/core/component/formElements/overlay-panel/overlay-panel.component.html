@@ -1,0 +1,31 @@
+<div (click)="toggle($event)" class="sub-form">{{ label }} <i class="pi pi-chevron-down"></i></div>
+<app-more-less-view [elementSize]="value.length" [maxLines]="4" [lineHeight]="50">
+    <div class="billet-container" *ngFor="let item of value">
+        <div>{{item.label}}</div>
+        <div>{{item.description || 'Введите описание'}}</div>
+    </div>
+</app-more-less-view>
+<p-overlayPanel #overlay showTransitionOptions="0s" hideTransitionOptions="0s" styleClass="double-list">
+    <ng-template pTemplate>
+        <div *ngIf="page == 0; else list" class="options wrapper" [class.multiply]="multiply">
+            <div *ngFor="let option of options" class="option" [class.added]="alreadyAdd[option.code]"
+                 [pTooltip]="option?.description" tooltipPosition="top" tooltipStyleClass="map"
+            >
+                <div (click)="addField(option); overlayResize($event, overlay)">{{option.label}}</div>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template #list>
+        <div class="list wrapper">
+            <div *ngFor="let item of value; let i = index" class="block">
+                <div>{{item.label}}</div>
+                <i class="pi pi-times" (click)="remove(i, item.code)"></i>
+                <textarea pInputTextarea [autoResize]="true" [(ngModel)]="item.description" rows="1"
+                    placeholder="Введите описание ..."
+                ></textarea>
+
+            </div>
+            <button (click)="page = 0; overlayResize($event, overlay)">Добавить</button>
+        </div>
+    </ng-template>
+</p-overlayPanel>

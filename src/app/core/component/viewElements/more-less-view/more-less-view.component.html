@@ -1,0 +1,7 @@
+<div class="container" [style]="'max-height: ' + (!showed ? _maxHeight : 'unset')">
+    <ng-content></ng-content>
+</div>
+<div class="chips-shower" *ngIf="elementSize > maxLines" (click)="changeSize()">
+    <i class="pi pi-chevron-{{!showed ? 'down' : 'up'}}"></i>
+    {{!showed ? "Показать еще " + (elementSize - maxLines) + " ..." : "Свернуть"}}
+</div>

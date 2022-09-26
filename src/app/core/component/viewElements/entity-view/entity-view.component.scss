@@ -1,0 +1,261 @@
+@import "src/assets/styles/variables";
+
+.pane {
+    position: relative;
+
+    .face{
+        height: 130px;
+        padding: 20px 22px 25px 30px;
+        display: flex;
+        background-color: white;
+        flex-direction: column;
+        flex-wrap: wrap;
+        overflow: hidden;
+        justify-content: left;
+        position: relative;
+
+        p-avatar{
+            ::ng-deep  .p-avatar.p-avatar-lg{
+                width: 50px;
+                height: 50px;
+                background-color: #fafafa;
+                margin: 0 15px 25px 0;
+
+                .p-avatar-icon{
+                    color: #eaebec;
+                }
+            }
+        }
+
+        .name {
+            font-size: 13px;
+            height: 32px;
+            width: calc(100% - 65px);
+            line-height: 20px;
+            margin-bottom: 5px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            text-align: left;
+            color: $color-black;
+            display: inline-flex;
+            flex-direction: column;
+
+            span, & > div:first-child{
+                display: block;
+                text-transform: uppercase;
+                font-weight: bold;
+                line-height: 13px;
+            }
+
+            & > div:first-child {
+                white-space: pre-line;
+                line-height: 17px;
+                margin: auto 0;
+            }
+
+        }
+
+        .info {
+            font-size: $font-size-small;
+            line-height: 11px;
+            width: calc(100% - 65px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            height: 15px;
+            color: $color-black;
+        }
+
+        .pointer-menu{
+            position: absolute;
+            top: 14px;
+            right: 11px;
+            width: 25px;
+            height: 25px;
+            border-radius: 13px;
+            text-align: center;
+            line-height: 25px;
+
+            &:hover{
+                background-color: $color-light1;
+            }
+        }
+
+
+        .progress{
+            width: 100%;
+            display: inline-flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            margin-left: -65px;
+
+            &:not(.archive) span{
+                width: 48px;
+                height: 6px;
+                background-color: $color-red;
+                flex: 1 1 48px;
+                margin-right: 5px;
+            }
+
+            &.archive span{
+                width: 40px;
+                height: 6px;
+                background-color: $color-grey1;
+            }
+
+            span.active ~ span{
+                background-color: $color-grey1;
+            }
+        }
+    }
+
+    &.scrolled {
+        .face.mini{
+            display: inline-flex;
+        }
+    }
+
+    .face.mini{
+        height: 65px;
+        z-index: 100;
+        display:none;
+        flex-direction: row;
+        align-items: center;
+        position: fixed;
+        top: unset;
+        width: 366px;
+        padding: 0 25px 0 30px;
+        border-bottom: 1px solid $color-blue-light0;
+
+        .pointer-menu{
+            position: absolute;
+            right: 11px;
+            top: calc(50% - 13px);
+        }
+
+        & > .name{
+            font-size: $font-size-main;
+            color: $color-black;
+            line-height: 16px;
+            margin: 0;
+            display: inline-flex;
+            flex-direction: column;
+            height: 60px;
+            justify-content: center;
+            align-items: baseline;
+
+
+            span {
+                display: block;
+                font-weight: bold;
+                text-transform: uppercase;
+                color: $color-black;
+            }
+
+            & > div:first-child {
+                white-space: pre-line;
+            }
+        }
+
+        & > .position, & > .progress{
+            display: none;
+        }
+
+        & > p-avatar{
+
+            ::ng-deep  .p-avatar.p-avatar-lg{
+                width: 40px;
+                height: 40px;
+                margin: 0 15px 0 0;
+            }
+        }
+    }
+
+    .main_data{
+        border-top: 1px solid $color-blue-light0;
+        padding: 0 22px 50px;
+
+        .const-data{
+            height: 32px;
+            line-height: 30px;
+            padding: 0 10px;
+            color: $color-black;
+            white-space: nowrap;
+
+            &.green{
+                color: $color-green;
+            }
+
+            p-avatar{
+                float: left;
+                margin-right: 10px;
+            }
+
+            span{
+                white-space: initial;
+                line-height: 13px;
+                height: 30px;
+                display: block;
+                padding: 4px 0 0;
+            }
+        }
+
+        .sub-form{
+            @extend %sub-form-header;
+        }
+
+    }
+
+    .buttons{
+        display: flex;
+        position: sticky;
+        bottom: 0;
+        height: 70px;
+        padding: 0 22px;
+        background: $color-light1;
+        align-items: center;
+        justify-content: space-between;
+
+        ::ng-deep .p-button{
+
+        }
+    }
+
+    ::ng-deep {
+        .p-sidebar.save-bar {
+            width: 100%;
+            height: 70px;
+            display: inline-flex;
+            flex-direction: row;
+            padding: 0 53px;
+            background: $color-light1;
+            align-items: center;
+            justify-content: flex-start;
+            border-top: 1px solid $color-blue-light0;
+
+            &:not(.full){
+                left: auto;
+                padding: 0px 24px;
+            }
+
+            .p-sidebar-header {
+                display: none;
+            }
+
+            .p-sidebar-content {
+                width: 319px;
+                height: 30px;
+                display: inline-flex;
+            }
+
+            .p-button {
+                @extend %button;
+                @include button-outline($color-green, $color-green);
+                margin: 0 1px;
+                width: 50%;
+            }
+        }
+    }
+
+}

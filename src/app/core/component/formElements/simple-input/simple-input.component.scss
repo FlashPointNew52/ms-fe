@@ -1,0 +1,44 @@
+@import "src/assets/styles/variables";
+
+:host{
+    //display: block;
+}
+
+.p-input-icon-right{
+    width: 100%;
+
+    input{
+        @extend %input;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-right: 15px;
+
+        &.p-filled{
+            @extend %input-filled;
+        }
+
+        &::placeholder{
+            color: $color-blue-light1;
+        }
+
+        &:hover{
+            @extend %input-hover;
+        }
+
+        &:focus-visible{
+            @extend %input-focus;
+        }
+    }
+
+    &:hover input{
+        @extend %input-hover;
+    }
+
+    &:hover input.p-filled + i, input:focus-visible + i{
+        display: block;
+    }
+
+    i{
+        @include times;
+    }
+}

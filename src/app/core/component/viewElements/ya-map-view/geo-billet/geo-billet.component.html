@@ -1,0 +1,32 @@
+<div [ngSwitch]="data!.subtype" class="billet-container">
+    <ng-container *ngSwitchCase="'stop'" [ngTemplateOutlet]="stopBillet" [ngTemplateOutletContext]="{$implicit: data}"></ng-container>
+    <ng-container *ngSwitchCase="'area'" [ngTemplateOutlet]="areaBillet" [ngTemplateOutletContext]="{$implicit: data}"></ng-container>
+    <ng-container *ngSwitchCase="'business'" [ngTemplateOutlet]="pointBillet" [ngTemplateOutletContext]="{$implicit: data}"></ng-container>
+    <ng-container *ngSwitchCase="'address'" [ngTemplateOutlet]="pointBillet" [ngTemplateOutletContext]="{$implicit: data}"></ng-container>
+    <ng-container *ngSwitchDefault>
+        <ng-content></ng-content>
+    </ng-container>
+</div>
+
+<ng-template #stopBillet let-stop>
+    <div [pTooltip]="stop.name" tooltipPosition="top" tooltipStyleClass="map-address">
+        {{stopTypes[stop.info!.stopType]?.labelShort}} {{stop.name}}
+    </div>
+    <div class="metro-line">
+        <span *ngIf="stop.info?.undergroundData?.color"
+                [style.backgroundColor]="stop.info?.undergroundData?.color"
+        ></span>
+        {{stop.info?.undergroundData?.name || stopTypes[stop.info?.stopType]?.labelLong}}
+    </div>
+    <span class="remove pi pi-times" (click)="delete.emit(stop)"></span>
+</ng-template>
+<ng-template #pointBillet let-obj>
+    <div [pTooltip]="obj?.name" tooltipPosition="top" tooltipStyleClass="map-address">{{obj?.name}}</div>
+    <div *ngIf="obj?.description">{{obj?.description}}</div>
+    <span class="remove pi pi-times" (click)="delete.emit(obj)"></span>
+</ng-template>
+<ng-template #areaBillet let-obj>
+    <div [pTooltip]="obj?.name" tooltipPosition="top" tooltipStyleClass="map-address">{{obj?.name || "Безымянная область"}}</div>
+    <div>{{obj?.description}}</div>
+    <span class="remove pi pi-times" (click)="delete.emit(obj)"></span>
+</ng-template>

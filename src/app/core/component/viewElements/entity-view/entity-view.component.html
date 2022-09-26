@@ -1,0 +1,138 @@
+<div class="pane" #pane (scroll)="pane.scrollTop > 65 ? pane.classList.add('scrolled') : pane.classList.remove('scrolled')">
+    <ng-template #face let-withDop>
+        <div class="face" [class.mini]="!withDop">
+            <i class="pi pi-ellipsis-v pointer-menu" #pointerMenu (click)="menu.toggle($event)">
+            </i>
+            <p-avatar image="assets/temp/person.jfif" size="large" shape="circle"></p-avatar>
+            <div class="name" ><span *ngIf="getLastName() as lastName">{{lastName}}</span> <div>{{_entity.name || this.form.get('name')?.value}}</div></div>
+            <ng-container *ngIf="withDop">
+                <div class="info">{{ type == 'person' ? 'Собственник 90%' : getFieldActivity()}}</div>
+                <div class="info">Рейтинг (общий) - 5 баллов</div>
+            </ng-container>
+            <div class="progress" [class.archive]="false">
+                    <span *ngFor="let i of personClass.stageCodeOptions | keyvalue: utils.originalOrder" [attr.data]="i.key"
+                          [class.active]="i.key == _entity.stageCode"
+                          [hidden]="false"></span>
+            </div>
+        </div>
+    </ng-template>
+    <ng-container *ngTemplateOutlet="face; context: {$implicit: false} "></ng-container>
+    <ng-container *ngTemplateOutlet="face; context: {$implicit: true}"></ng-container>
+    <p-tieredMenu #menu [popup]="true" appendTo="body" [model]="contextMenu" [styleClass]="tieredClass"></p-tieredMenu>
+    <form class="main_data" [formGroup]="form" >
+        <div class="sub-form">{{ type == 'person' ? 'ФИО контакта' : 'Компания'}}</div>
+
+        <ng-container *ngIf="type == 'person'">
+            <label>Фамилия</label>
+            <app-simple-input placeholder="Добавить фамилию контакта..." formControlName="lastName"></app-simple-input>
+        </ng-container>
+
+
+        <label>{{ type == 'person' ? 'Имя и Отчество' : 'Название компании' }}</label>
+        <app-simple-input [placeholder]="'Добавить ' + (type == 'person' ? 'имя и отчество контакта...' : 'название компании...')" formControlName="name">
+        </app-simple-input>
+        <div class="sub-form">Общая информация</div>
+        <label>Дата создания {{ type == 'person' ? 'контакта' : 'компании'}}</label>
+        <div class="const-data green">{{_entity.addDate | mDate}}</div>
+        <label>Источник привлечения</label>
+        <app-multiselect
+                [ngModel]="{}" (ngModelChange)="$event" formControlName="sources"
+                label="Добавить источник ..."
+                placeholder="Поиск по всем записям ..."
+                [params]="[
+                        {label: 'Контакты', code: 'person', searchService: null, filter: {}},
+                        {label: 'Организации', code: 'organisation', searchService: null, filter: {}},
+                        {label: 'Интернет площадки', code: 'other'},
+                        {label: 'Печатные издания', code: 'other'},
+                        {label: 'Социальные сети', code: 'other'},
+                        {label: 'Мессенджеры', code: 'other'},
+                        {label: 'E-mail-рассылка', code: 'other'},
+                        {label: 'Рекомендации', code: 'other'}
+                    ]"
+        ></app-multiselect>
+        <label>{{type == 'person' ? 'Контакт создан' : 'Компания создана' }}</label>
+        <div class="const-data"><p-avatar image="assets/temp/person.jfif" shape="circle"></p-avatar><span>{{_entity.name}} {{getLastName()}}</span></div>
+
+        <label>Статус взаимодействия</label>
+        <app-dropdown [options]="personClass.stateCodeArray"  formControlName="state" (ngModelChange)="addComment('state', $event)"
+                      optionLabel="label" [showClear]="false" scrollHeight="300px"
+
+        ></app-dropdown>
+        <label>Стадия {{type == 'person' ? 'контакта' : 'компании' }}</label>
+        <app-dropdown [options]="(type == 'person' ? personClass : companyClass).stageCodeArray" formControlName="stageCode"
+                      (ngModelChange)="addComment('stageCode', $event)"
+                      [showClear]="false">
+        </app-dropdown>
+        <ng-container *ngIf="type == 'company'">
+            <label>Статус компании</label>
+            <app-dropdown [options]="companyClass.typeCodeArray" formControlName="typeCode" (ngModelChange)="addComment('typeCode', $event)"
+                          [showClear]="false">
+            </app-dropdown>
+            <label>Сфера деятельности</label>
+            <app-dropdown [options]="companyClass.fieldActivityArray" formControlName="fieldActivity"
+                          [showClear]="false">
+            </app-dropdown>
+            <label>Подразделение компании</label>
+            <app-dropdown [options]="companyClass.branchTypeArray" formControlName="branchType"
+                          [showClear]="false">
+            </app-dropdown>
+        </ng-container>
+        <label>Ответственный</label>
+        <app-multiselect
+                formControlName="responsible"
+                label="Добавить ответственного ..."
+                placeholder="Поиск по всем записям ..."
+                [params]="[
+                        {label: 'Пользователи', code: 'agent', searchService: {}, filter: {}},
+                        {label: 'Группы', code: 'group', filter: {}}
+                ]"
+        ></app-multiselect>
+        <label>Теги</label>
+        <app-dropdown-tag formControlName="tag"></app-dropdown-tag>
+        <div class="sub-form">Контактные данные</div>
+        <label pTooltip="После ввода, нажмите - Enter" tooltipPosition="top">Телефоны</label>
+        <app-chips-option mask="+0 (000) 000-00-00" [addOnBlur]="false" formControlName="phones"
+                          placeholder="Введите номер телефона ..."
+                          [items]="(type == 'person' ? personClass : companyClass).phoneTypeArray"
+        ></app-chips-option>
+        <label pTooltip="После ввода, нажмите - Enter" tooltipPosition="top">Мессенджеры</label>
+        <app-chips-option mask="+0 (000) 000-00-00" [addOnBlur]="false" formControlName="messengers"
+                          placeholder="Введите номер мессенджера ..." typeLink="" targetLink="_blank"
+                          [items]="[
+                              {label: 'Whatsapp', value: 'WHATSAPP', icon: 'pi-whatsapp', text: 'Whatsapp', typeLink: 'https://wa.me/'},
+                              {label: 'Viber', value: 'VIBER', icon: 'pi-viber', text: 'Viber', typeLink: 'viber://contact?number='},
+                              {label: 'Telegram', value: 'TELEGRAM', icon: 'pi-telegram', text: 'Telegram', typeLink: ''}
+                          ]"
+        ></app-chips-option>
+
+        <label pTooltip="После ввода, нажмите - Enter" tooltipPosition="top">Email адреса</label>
+        <app-chips-option placeholder="Введите email ..." formControlName="emails" typeLink="mailto:"
+                          [items]="[]"></app-chips-option>
+        <label pTooltip="После ввода, нажмите - Enter" tooltipPosition="top">Сайты</label>
+        <app-chips-option placeholder="Введите url сайта ..." formControlName="sites" typeLink="" targetLink="_blank"
+        ></app-chips-option>
+
+        <label pTooltip="После ввода, нажмите - Enter" tooltipPosition="top">Социальные сети</label>
+        <app-chips-option formControlName="socials" typeLink="" targetLink="_blank"
+                          placeholder="Введите социальную сеть ..."
+                          [items]="[
+                              {label: 'Вконтакте', value: 'VK', icon: 'pi-vk', text: 'Вконтакте'},
+                              {label: 'Одноклассники', value: 'OK', icon: 'pi-ok', text: 'Одноклассники'},
+                              {label: 'Facebook', value: 'FACEBOOK', icon: 'pi-facebook', text: 'Facebook'},
+                              {label: 'Instagram', value: 'INSTAGRAM', icon: 'pi-instagram', text: 'Instagram'},
+                              {label: 'Twitter', value: 'TWITTER', icon: 'pi-twitter', text: 'Twitter'},
+                          ]"
+        ></app-chips-option>
+        <div class="sub-form">{{ type == 'person' ? "Адрес проживания" : "Адрес местоположения" }}</div>
+        <app-address-input [addressType]="type == 'person' ? 'apartment' : 'office'"></app-address-input>
+        <label>Дополнительно</label>
+        <textarea rows="1" cols="30" pInputTextarea #textarea [autoResize]="true" formControlName="description"  placeholder="Введите дополнительную информацию ..."
+        ></textarea>
+    </form>
+
+    <p-sidebar [visible]="showSavePanel" position="bottom" [blockScroll]="false" [styleClass]="'save-bar ' + (fullSaveBar ? 'full' : '')" [modal]="false">
+        <button pButton type="button" label="Сохранить" class="p-button-green" (click)="save()"></button>
+        <button pButton type="button" label="Отмена" class="p-button-outlined" (click)="recover()"></button>
+    </p-sidebar>
+
+</div>

@@ -1,0 +1,169 @@
+<div class="head main-head">
+          <span class="logo-title">
+            maklersoft
+          </span>
+    <div class="search-block">
+        <input class="search">
+        <img alt="поиск" class="magnifier" src="../assets/лупа.png">
+    </div>
+</div>
+<div class="tile-board" style="">
+
+    <div class="block-title">ОТОБРАЖЕНИЕ ТЕКУЩИХ ЗНАЧЕНИЙ</div>
+    <div class="tile-group">
+        <div class="tile-top main">
+            <div class="flex-col tile-left">
+                <div class="tile-title white-font">ЗАДАЧИ НА СЕГОДНЯ</div>
+                <div class="tile-description white-font">Новые, На сегодня...</div>
+            </div>
+            <div class="num white-font">17</div>
+        </div>
+        <div class="tile-top main" (click)="turnTo('', tabs.HOME, {})">
+            <div class="flex-col tile-left">
+                <div class="tile-title white-font">ЕЖЕДНЕВНИК</div>
+                <div class="tile-description white-font">Задачи, Выполненые, Просроченые...</div>
+            </div>
+            <div class="num white-font">17</div>
+        </div>
+        <div class="tile-top main ">
+            <div class="flex-col tile-left">
+                <div class="tile-title white-font">СООБЩЕНИЯ</div>
+                <div class="tile-description white-font">Новые</div>
+            </div>
+            <div class="num white-font">17</div>
+        </div>
+        <div class="tile-top main ">
+            <div class="flex-col tile-left">
+                <div class="tile-title white-font">ЗАМЕТКИ</div>
+            </div>
+            <div class="num white-font">17</div>
+        </div>
+        <div class="tile-top main ">
+            <div class="flex-col tile-left">
+                <div class="tile-title white-font">ЧАТ</div>
+                <div class="tile-description white-font">Новые сообщения</div>
+            </div>
+            <div class="num white-font">17</div>
+        </div>
+    </div>
+
+    <div class="tile-group">
+        <div class="tile-bot">
+            <div class="tile-top" (click)="turnTo('', tabs.HOME, {})">
+                <div class="flex-col tile-left">
+                    <div class="tile-title white-font">ПРЕДЛОЖЕНИЯ</div>
+                    <div class="tile-description white-font">Объекты, Аренда, Продажа...</div>
+                </div>
+                <div class="num white-font">17</div>
+            </div>
+            <div class="tile-bot bottom">
+                <div class="flex-col tile-num-block">
+                    <div class="num white-font">717</div>
+                    <div class="num-title white-font">ПОСТУПИЛО</div>
+                </div>
+                <div class="dif-line"></div>
+                <div class="flex-col tile-num-block">
+                    <div class="num white-font">13</div>
+                    <div class="num-title white-font">В ЛИСТИНГЕ</div>
+                </div>
+            </div>
+        </div>
+        <div class="tile-bot">
+            <div class="tile-top" (click)="turnTo('', tabs.HOME, {})">
+                <div class="flex-col tile-left">
+                    <div class="tile-title white-font">ЗАЯВКИ</div>
+                    <div class="tile-description white-font">Подбор недвижимости</div>
+                </div>
+                <div class="num white-font">17</div>
+            </div>
+            <div class="tile-bot bottom">
+                <div class="flex-col tile-num-block">
+                    <div class="num white-font">717</div>
+                    <div class="num-title white-font">ПОСТУПИЛО</div>
+                </div>
+                <div class="dif-line"></div>
+                <div class="flex-col tile-num-block">
+                    <div class="num white-font">13</div>
+                    <div class="num-title white-font">В ЛИСТИНГЕ</div>
+                </div>
+            </div>
+        </div>
+        <div class="tile-bot">
+            <div class="tile-top" (click)="turnTo('Сделки', tabs.DEAL_LIST, {})">
+                <div class="flex-col tile-left">
+                    <div class="tile-title white-font">СДЕЛКИ</div>
+                    <div class="tile-description white-font">Организация работы, Регламенты
+                        Ежедневник, Планировщик...
+                    </div>
+                </div>
+                <div class="num white-font">17</div>
+            </div>
+            <div class="tile-bot bottom">
+                <div class="flex-col tile-num-block">
+                    <div class="num white-font">717</div>
+                    <div class="num-title white-font">ПОСТУПИЛО</div>
+                </div>
+                <div class="dif-line"></div>
+                <div class="flex-col tile-num-block">
+                    <div class="num white-font">13</div>
+                    <div class="num-title white-font">В ЛИСТИНГЕ</div>
+                </div>
+            </div>
+        </div>
+        <div class="tile-bot">
+            <div class="tile-top">
+                <div class="flex-col tile-left">
+                    <div class="tile-title white-font">АНАЛИТИКА</div>
+                    <div class="tile-description white-font">Отчеты, Графики, Объекты, Заявки,
+                        Пользователи, Конверсия...
+                    </div>
+                </div>
+                <div class="num white-font">17</div>
+            </div>
+            <div class="tile-bot bottom">
+                <div class="flex-col tile-num-block">
+                    <div class="num white-font">717</div>
+                    <div class="num-title white-font">ПОСТУПИЛО</div>
+                </div>
+                <div class="dif-line"></div>
+                <div class="flex-col tile-num-block">
+                    <div class="num white-font">13</div>
+                    <div class="num-title white-font">В ЛИСТИНГЕ</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="block-title">ДОПОЛНИТЕЛЬНО</div>
+    <div class="addition-tiles">
+        <div class="flex-col block blue-tile" (click)="turnTo('Список компаний', tabs.COMPANY_LIST, {})">
+            <div class="addition-title white-font">КОМПАНИИ</div>
+            <div class="addition-description white-font">Организации: Конкуренты,
+                Партнеры...
+            </div>
+        </div>
+        <div class="flex-col block blue-tile" (click)="turnTo('Список контактов', tabs.PERSON_LIST, {})">
+            <div class="addition-title white-font">КОНТАКТЫ</div>
+            <div class="addition-description white-font">Физические лица:
+                Клиенты,
+                Конкуренты, Партнеры...
+            </div>
+        </div>
+        <div class="flex-col block blue-tile" (click)="turnTo('', tabs.HOME, {})">
+            <div class="addition-title white-font">ПОЛЬЗОВАТЕЛИ</div>
+            <div class="addition-description white-font">Сотрудники  компании</div>
+        </div>
+        <div class="flex-col block blue-tile">
+            <div class="addition-title white-font">ДОКУМЕНТЫ</div>
+            <div class="addition-description white-font">Приказы, Соглашения
+                Договора...
+            </div>
+        </div>
+        <div class="flex-col block blue-tile" (click)="turnTo('', tabs.HOME, {})">
+            <div class="addition-title white-font">НАСТРОЙКИ</div>
+        </div>
+        <div class="flex-col block blue-tile">
+            <div class="addition-title white-font">ОПЛАТА</div>
+        </div>
+    </div>
+</div>

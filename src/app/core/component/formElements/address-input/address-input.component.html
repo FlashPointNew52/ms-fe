@@ -1,0 +1,80 @@
+<div [formGroup]="addressForm!">
+    <label>Регион</label>
+    <app-search-panel [placeholder]="'Поиск по региону'" formControlName="region"
+                      (rawData)="setData('region', $event)"
+                      [serviceData]="{
+                            serviceMethod: getServiceMethod(),
+                            binder: getService(),
+                            displayField: displayFunc,
+                            params: ['region', null]
+                      }">
+    </app-search-panel>
+    <label>Населенный пункт</label>
+    <app-search-panel [placeholder]="'Поиск по населенному пункту'" formControlName="city"
+                      (rawData)="setData('city', $event)"
+                      [serviceData]="{
+                            serviceMethod: getServiceMethod(),
+                            binder: getService(),
+                            displayField: displayFunc2,
+                            params: ['city', addressStructure.region.id]
+                       }">
+    </app-search-panel>
+    <label>Название улицы</label>
+    <app-search-panel [placeholder]="'Поиск по улице, переулку, проезду и т.д.'" formControlName="street"
+                      (rawData)="setData('street', $event)"
+                      [serviceData]="{
+                            serviceMethod: getServiceMethod(),
+                            binder: getService(),
+                            displayField: displayFunc1,
+                            params: ['street', addressStructure.city.id]
+                       }"
+                      [disabled]="addressStructure.city.id == null">
+    </app-search-panel>
+    <label>Номер дома</label>
+    <app-search-panel [placeholder]="'Поиск по дому, строению, сооружению и т.д.'" [minLength]="1" formControlName="building"
+                      (rawData)="setData('building', $event)"
+                      [serviceData]="{
+                            serviceMethod: getServiceMethod(),
+                            binder: getService(),
+                            displayField: displayFunc1,
+                            params: ['building', addressStructure.street.id]
+                       }"
+                      [disabled]="addressStructure.street.id == null"
+    ></app-search-panel>
+    <label>{{addressType == 'apartment' ? 'Номер квартиры' : 'Номер помещения'}}</label>
+    <app-simple-input formControlName="apartment"
+                      [placeholder]="Введите номер ..."
+                      [disabled]="!addressStructure.building.name || addressStructure.building.name!.length == 0"
+    ></app-simple-input>
+    <label>Административный район</label>
+    <app-simple-input formControlName="admArea"
+                      placeholder="Введите административный район ..."
+                      [disabled]="!addressStructure.building.name|| addressStructure.building.name!.length == 0"
+    ></app-simple-input>
+    <label>Микрорайон</label>
+    <app-simple-input formControlName="area"
+                      [pTooltip]="addressForm?.get('area')?.value" tooltipPosition="top"
+                      placeholder="Введите микрорайон ..."
+                      [disabled]="!addressStructure.building.name || addressStructure.building.name!.length == 0"
+    ></app-simple-input>
+    <label pTooltip="После ввода, нажмите - Enter" tooltipPosition="top">Остановки / Станции</label>
+    <app-chips-option [addOnBlur]="false" (valueChange)="setData('stations', $event)"
+                      placeholder="Введите остановку или станцию ..." formControlName="stations"
+                      [disabled]="!addressStructure.building.name || addressStructure.building.name!.length == 0"
+                      [items]="[
+                          {label: 'Остановка наземного транспорта', value: 'SELF', text: 'Ост.наз.тр.'},
+                          {label: 'Остановка водного транспорта', value: 'HOME', text: 'Ост.вод.тр.'},
+                          {label: 'Станция метрополитена', value: 'INVALID', text: 'Ст. метро'},
+                          {label: 'Станция электропоезда', value: 'WORK', text: 'Ст.эл.п.'},
+                    ]"
+    ></app-chips-option>
+
+    <label>Время в пути</label>
+    <span class="p-input-icon-right">
+        <p-inputNumber suffix=" мин." formControlName="time" (onInput)="setData('time', $event)"
+                       placeholder="Укажите время в пути ..."
+                       [disabled]="!addressStructure.building.name || addressStructure.building.name!.length == 0"
+        ></p-inputNumber>
+        <i class="pi pi-times" (click)="addressForm?.get('time')?.setValue(''); setData('time', '')"></i>
+    </span>
+</div>

@@ -1,0 +1,136 @@
+@import "src/assets/styles/variables";
+@import "../stylesForm";
+
+::ng-deep app-multiselect {
+    .p-multiselect{
+        width: 100%;
+        height: 34px;
+        min-height: 34px;
+
+        &.p-multiselect-open{
+            @extend %input-focus;
+        }
+
+        &.auto-height{
+            height: auto;
+        }
+
+        .p-multiselect-label-container{
+            .placeholder{
+                color: $color-blue-light1;
+            }
+
+            .p-multiselect-label{
+                display: flex;
+                cursor: pointer;
+                flex-wrap: wrap;
+
+                .p-multiselect-token{
+                    padding: 0 15px;
+                    height: 30px;
+                    border-radius: 15px;
+                    background-color: $color-light1;
+                    color: $color-black;
+                    width: max-content;
+                    display: flex;
+                    align-items: center;
+                    position: relative;
+                    margin: 1px 5px 0 0;
+                }
+            }
+        }
+
+        @extend %input;
+
+        .p-multiselect-panel{
+            left: -1px !important;
+            background: white;
+        }
+    }
+
+    .p-inputwrapper-filled .p-multiselect{
+        @extend %input-filled;
+
+
+        &:hover{
+            @extend %input-hover;
+        }
+    }
+
+    .p-multiselect-trigger{
+        display: none;
+    }
+}
+
+::ng-deep{
+    @include filter-header-clear(multiselect,-panel, 23px, 28px);
+}
+
+::ng-deep .multiselect-panel{
+    @include multiselect-style;
+    @include header;
+    @extend %panel;
+
+    padding: 0 0 10px;
+
+    .p-multiselect-close{
+        display: none;
+    }
+
+    .p-multiselect-items .p-multiselect-item-group {
+        padding: 8px 30px;
+        font-weight: bold;
+        color: $color-black-ever-lighter;
+
+        .no-found{
+            display: block;
+            font-weight: normal;
+            padding: 5px 0 0;
+            color: $color-black-lighter;
+            line-height: 18px;
+        }
+
+        .group-header{
+            line-height: 16px;
+            display: inline-flex;
+            width: 100%;
+            justify-content: space-between;
+
+            .add-button{
+                color: $color-green;
+                font-weight: normal;
+                cursor: pointer;
+
+                &:hover{
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+
+    &.withoutHeader{
+        padding: 10px 0;
+
+        .p-multiselect-item{
+            line-height: 35px;
+            padding: 0 25px;
+
+            & > span{
+                color: $color-black;
+            }
+
+            &:hover{
+                background-color: $color-blue-light;
+            }
+
+            &:hover, &.p-highlight{
+                @include checkbox-parent-hover;
+
+                //span{
+                //    color: $color-black;
+                //}
+            }
+
+        }
+    }
+}

@@ -1,0 +1,29 @@
+<p-dropdown [options]="options" [(ngModel)]="value" [placeholder]="placeholder" [showClear]="showClear" [filter]="filter" #dropdown
+            scrollHeight="315px" optionLabel="label" [optionValue]="optionValue"
+            (onChange)="change($event)" [group]="group" [appendTo]="appendTo"
+            [panelStyleClass]="'dropdown-panel' + (dropdown._filterValue && dropdown._filterValue.length > 0 ? ' withoutSearch' : '')"
+>
+    <ng-template let-val pTemplate="selectedItem">
+        <div>{{(usePrefix ? placeholder + ': ' : '') + (onlyDropdown ? placeholder : val.label)}}</div>
+    </ng-template>
+    <ng-template pTemplate="header">
+        <span class="filter-clear pi pi-times" (click)="$event.stopPropagation(); dropdown._filterValue = ''; dropdown.activateFilter()"></span>
+        <div *ngIf="headerText" class="p-multiselect-header">{{headerText}}</div>
+    </ng-template>
+    <ng-template let-group pTemplate="group">
+        <div (click)="$event.stopPropagation()">
+            <span>{{group.label}}</span><span class="action" *ngIf="group.action" >{{group.action}}</span>
+        </div>
+    </ng-template>
+    <ng-template let-item pTemplate="item">
+        <p-radioButton [value]="item[optionValue]" [(ngModel)]="value"></p-radioButton>
+        <div class="dropdownItem">
+            <span>{{item.label}}</span>
+            <span *ngIf="item.description">{{item.description}}</span>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="empty">
+        <span>Данных не найдено</span>
+    </ng-template>
+</p-dropdown>
+

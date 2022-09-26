@@ -1,0 +1,134 @@
+@import "src/assets/styles/variables";
+
+.dropdownItem{
+    display: inline-flex;
+    flex-direction: column;
+
+    span:last-child:not(:first-child){
+        font-size: $font-size-small;
+        color: $color-black-ever-lighter;
+        margin-top: 5px;
+        white-space: break-spaces;
+    }
+}
+
+
+::ng-deep {
+    @include filter-header-clear(dropdown,-panel, 25px, 25px);
+
+    p-dropdown .p-dropdown{
+        @extend %input;
+
+        .p-dropdown-trigger{
+            display: none;
+        }
+
+        &.p-dropdown-open{
+            @extend %input-focus;
+        }
+
+        .p-dropdown-panel{
+            left: -1px !important;
+            min-width: 170px;
+        }
+
+        .p-dropdown-clear-icon{
+            position: absolute;
+            right: 7px;
+            top: calc(50% + 2px);
+            font-size: 12px;
+
+            &:hover{
+                color: $color-blue-dark;
+            }
+        }
+    }
+
+    p-dropdown.p-inputwrapper-filled {
+        .p-dropdown{
+            @extend %input-filled;
+
+            &:hover{
+                @extend %input-hover;
+            }
+        }
+    }
+
+    .p-dropdown-label{
+
+    }
+
+    .p-dropdown-panel {
+        width: calc(100% + 2px);
+        max-width: 350px;
+
+        @extend %panel;
+
+        @include header;
+
+
+        .header-text{
+            display: block;
+            padding: 15px;
+        }
+
+        .p-dropdown-items {
+            .p-dropdown-item-group{
+                padding: 10px 25px 0px;
+                font-weight: bold;
+                color: $color-black;
+
+                div{
+                    display: inline-flex;
+                    width: 100%;
+                    justify-content: space-between;
+
+                    span.action{
+                        color: $color-green;
+                        font-size: $font-size-small;
+                        font-weight: normal;
+                        cursor: pointer;
+
+                        &:hover{
+                            text-decoration: underline;
+                        }
+                    }
+                }
+            }
+
+            .p-dropdown-item{
+                padding: 9px 25px;
+                color: $color-black;
+                font-size: $font-size-main;
+                line-height: 19px;
+                display: inline-flex;
+                align-items: center;
+                width: 100%;
+
+                &:not(.p-highlight):not(.p-disabled):hover, &.p-highlight:hover{
+                    background: $color-blue-light;
+                    color: $color-black;
+
+                    ::ng-deep p-radiobutton .p-radiobutton .p-radiobutton-box{
+                        border-color: $color-black-ever-lighter1;
+                    }
+                }
+
+                &.p-highlight{
+                    background: none;
+                }
+
+                p-radiobutton{
+                    margin-right: 8px;
+                }
+            }
+
+            .p-dropdown-item-group ~ p-dropdownitem {
+                .p-dropdown-item {
+                    padding: 0.5rem 24px;
+                }
+            }
+
+        }
+    }
+}

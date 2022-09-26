@@ -1,0 +1,24 @@
+<div class="log_screen" [hidden]="authorized">
+    <span class="label">maklersoft</span>
+    <hr>
+    <div class="main_form">
+        <div class="motto">
+            <span>Одна страна - одна система</span>
+            <span>  Команда MaklerSoft</span>
+        </div>
+        <div class="select_type" *ngIf="path !== '/reset'">
+            <span routerLink="/signup" routerLinkActive="active">РЕГИСТРАЦИЯ</span>
+            |
+            <span routerLink="/login">ВХОД В СИСТЕМУ</span>
+        </div>
+        <div class="select_type" *ngIf="path == '/reset'"><span class="selected">ВОССТАНОВЛЕНИЕ ПАРОЛЯ</span>
+        </div>
+
+        <app-log-in *ngIf="path == '/login'"></app-log-in>
+        <app-sign-up *ngIf="path == '/signup'"></app-sign-up>
+        <app-reset *ngIf="path.indexOf('/reset') > -1 "></app-reset>
+
+    </div>
+    <hr style="bottom: 100px; top: auto;">
+    <span class="footer_text"></span>
+</div>

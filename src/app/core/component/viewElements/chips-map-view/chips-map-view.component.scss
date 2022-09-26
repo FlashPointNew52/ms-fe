@@ -1,0 +1,55 @@
+@import "src/assets/styles/variables";
+
+.chips-container {
+    display: block;
+    flex-direction: column;
+    max-height: 97px;
+    overflow: hidden;
+    margin-top: 10px;
+
+    &.showed{
+        max-height: unset;
+    }
+
+    div{
+        padding: 0 15px;
+        height: 30px;
+        border-radius: 15px;
+        background-color: $color-light1;
+        color: $color-black;
+        width: max-content;
+        align-items: center;
+        position: relative;
+        margin: 2px 0;
+        max-width: 100%;
+        display: block;
+        line-height: 30px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+
+        &:hover{
+            background: $color-dark-black;
+            color: $color-light1;
+            cursor: pointer;
+        }
+    }
+}
+
+.chips-shower{
+    text-align: right;
+    color: $color-black;
+    cursor: pointer;
+    display: inline-flex;
+    width: 100%;
+    justify-content: end;
+    align-items: center;
+    margin-top: 14px;
+
+    .pi{
+        font-size: 16px;
+        padding-right: 5px;
+        color: $color-black;
+
+    }
+}

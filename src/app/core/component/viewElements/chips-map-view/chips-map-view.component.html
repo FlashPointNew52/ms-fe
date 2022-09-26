@@ -1,0 +1,7 @@
+<div class="chips-container" [class.showed]="showed" *ngIf="value.length > 0">
+    <div *ngFor="let val of value" (click)="showOnMap.emit(val)">{{val?.name}}</div>
+</div>
+<div class="chips-shower" *ngIf="value.length > maxShow" (click)="showed=!showed">
+    <i class="pi pi-chevron-{{!showed ? 'down' : 'up'}}"></i>
+    {{!showed ? "Показать еще " + (value.length - 3) + " ..." : "Свернуть"}}
+</div>

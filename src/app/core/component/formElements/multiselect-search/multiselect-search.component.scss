@@ -1,0 +1,56 @@
+@import "src/assets/styles/variables";
+@import "../stylesForm";
+
+::ng-deep app-multiselect-search {
+
+    .p-multiselect-panel{
+        @include multiselect-style;
+
+        .p-multiselect-items .p-multiselect-item-group {
+
+            .group-header{
+                line-height: 20px;
+            }
+
+            padding: 0.75rem 16px;
+            font-weight: bold;
+            color: $color-black-lighter;
+        }
+    }
+
+    .no-found{
+        display: block;
+        font-weight: normal;
+        padding: 5px 0 0 28px;
+        color: $color-black;
+        line-height: 20px;
+    }
+
+    .p-multiselect{
+        border: 0;
+
+        &.withoutSearch{
+            .p-multiselect-panel .p-multiselect-header .p-multiselect-filter-container .p-multiselect-filter-icon {
+               display: none;
+            }
+        }
+    }
+
+    .p-float-label{
+        &:not(.chipsable) {
+            input.p-multiselect-filter.p-inputtext:not(.p-dropdown-label){
+                border: none;
+                border-radius: 3px;
+            }
+        }
+    }
+
+}
+
+::ng-deep .without-close-button{
+    .p-multiselect-header{
+        .p-multiselect-close{
+            display: none;
+        }
+    }
+}

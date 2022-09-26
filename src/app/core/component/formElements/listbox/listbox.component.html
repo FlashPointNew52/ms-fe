@@ -1,0 +1,13 @@
+<p-listbox #listbox [(ngModel)]="value" (ngModelChange)="valueChange.emit($event)" [checkbox]="true" [filter]="true" [group]="true" [multiple]="true" optionLabel="header"
+           [options]="options" [showToggleAll]="false" filterPlaceHolder="Поиск по названию колонок..."
+           [styleClass]="'listbox' + (listbox._filterValue && listbox._filterValue.length > 0 ? ' withoutSearch' : '')"
+>
+    <ng-template pTemplate="header">
+        <span class="filter-clear pi pi-times" (click)="listbox._filterValue = ''; listbox.activateFilter()"></span>
+    </ng-template>
+    <ng-template let-group pTemplate="group">
+        <div>
+            <span>{{group.label}}</span>
+        </div>
+    </ng-template>
+</p-listbox>

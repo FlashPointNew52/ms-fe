@@ -1,0 +1,39 @@
+<ng-container *ngIf="!onlyDropdown else multiselect">
+    <span class="p-float-label">
+        <ng-container *ngTemplateOutlet="multiselect"></ng-container>
+        <label>{{label}}</label>
+    </span>
+</ng-container>
+
+<ng-template #multiselect>
+    <p-multiSelect [options]="showData" [group]="true" [(ngModel)]="selectedData" (ngModelChange)="emit($event)"
+                   scrollHeight="250px" [filterValue]="filterValue" [styleClass]="filterValue.length > 0 ? 'withoutSearch' : ''"
+                   display="chip" dropdownIcon="''" [filterPlaceHolder]="placeholder" (onFilter)="filterValue = $event.filter"
+                   [appendTo]="appendTo" [defaultLabel]="label" [showToggleAll]="showToggleAll"
+                   [panelStyleClass]="showCloseButton ? '' : 'without-close-button'"
+    >
+        <ng-template let-tags pTemplate="selectedItems">
+            <div *ngIf="onlyDropdown">{{label}}</div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <span class="p-multiselect-filter-icon pi pi-times" *ngIf="filterValue.length > 0" (click)="$event.stopPropagation(); filterValue = ''"></span>
+        </ng-template>
+        <ng-template let-group pTemplate="group">
+            <span class="group-header">
+                <div class="p-checkbox p-component">
+                    <div class="p-checkbox-box" [ngClass]="{'p-highlight': true}">
+                        <span class="p-checkbox-icon" [ngClass]="{'pi pi-check': true}"></span>
+                    </div>
+                </div>{{group.label}}
+            </span>
+            <span *ngIf="group.items == 0" class="no-found">
+                 <div class="p-checkbox p-component">
+                    <div class="p-checkbox-box" [ngClass]="{'p-highlight': true}">
+                        <span class="p-checkbox-icon" [ngClass]="{'pi pi-check': true}"></span>
+                    </div>
+                </div>Записей не найдено</span>
+        </ng-template>
+
+    </p-multiSelect>
+</ng-template>
+

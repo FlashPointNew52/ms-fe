@@ -1,0 +1,30 @@
+<!--<div class="fields">-->
+<!--    <input [(ngModel)]="checkCodeForm.phone" [attr.placeholder]="'НОМЕР ТЕЛЕФОНА'" [mask]="'0 (000) 000-00-00'" [prefix] = "'+'"-->
+<!--           [attr.disabled]=>-->
+<!--    <input [(ngModel)]="checkCodeForm.checkCode" placeholder="" *ngIf="checkCodeForm.userId">-->
+<!--    <input [(ngModel)]="checkCodeForm.password" type="password" placeholder="НОВЫЙ ПАРОЛЬ" *ngIf="checkCodeForm.userId">-->
+<!--    <input [(ngModel)]="checkCodeForm.confirmPassword" type="password" placeholder="ПОДТВЕРДИТЬ ПАРОЛЬ"-->
+<!--           *ngIf="checkCodeForm.userId">-->
+<!--    <div class="link_button" (click)="cancel()">Отменить</div>-->
+<!--    <input class="submit" type="submit" value="ПРОВЕРИТЬ" (click)="get_code()" *ngIf="!checkCodeForm.userId"-->
+<!--           style="margin-top: 5px">-->
+<!--    <input class="submit" type="submit" value="УСТАНОВИТЬ ПАРОЛЬ" (click)="check_code()"-->
+<!--           *ngIf="checkCodeForm.userId" style="margin-top: 5px">-->
+<!--</div>-->
+
+<input type="text" [(ngModel)]="checkCodeForm.phone" [disabled]="checkCodeForm.userId || false" placeholder="ТЕЛЕФОН"
+       mask="+0 (000) 000-00-00"
+>
+<ng-container *ngIf="checkCodeForm.userId">
+    <input type="text" pInputText placeholder="ПРОВЕРОЧНЫЙ КОД" [(ngModel)]="checkCodeForm.checkCode">
+    <span class="p-float-label">
+    <p-password [toggleMask]="true" [(ngModel)]="checkCodeForm.password">ПАРОЛЬ</p-password>
+</span>
+</ng-container>
+
+<div class="link_button" *ngIf="!isAuth" (click)="cancel()">Отменить</div>
+
+<input class="submit" type="submit" value="ПРОВЕРИТЬ" (click)="get_code()" *ngIf="!checkCodeForm.userId"
+       style="margin-top: 5px">
+<input class="submit" type="submit" value="УСТАНОВИТЬ ПАРОЛЬ" (click)="check_code()"
+       *ngIf="checkCodeForm.userId" style="margin-top: 5px">

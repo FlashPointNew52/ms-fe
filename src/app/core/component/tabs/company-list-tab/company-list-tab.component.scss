@@ -1,0 +1,18 @@
+
+p-table{
+    ::ng-deep .p-datatable, ::ng-deep .p-datatable.p-datatable-hoverable-rows{
+        .p-datatable-tbody > tr > td.name > div > .name-text{
+            font-weight: bold;
+            text-transform: uppercase;
+
+            span{
+                font-weight: normal;
+                text-transform: initial;
+                font-size: 11px;
+                margin: 5px 0 0;
+                line-height: 11px;
+            }
+        }
+    }
+}
+

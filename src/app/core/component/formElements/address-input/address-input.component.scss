@@ -1,0 +1,9 @@
+@import "src/assets/styles/variables";
+
+::ng-deep app-address-input {
+
+    app-chips-option .p-chips p-dropdown .p-dropdown .p-dropdown-panel {
+        @include multiselect-style;
+        width: auto;
+    }
+}

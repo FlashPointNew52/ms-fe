@@ -1,0 +1,45 @@
+<div [ngClass]="{'p-chips p-component': true, 'p-disabled':disabled}" (click)="onClick()">
+    <ul [ngClass]="{
+        'p-inputtext p-chips-multiple-container':true,
+        'p-focus':focus,
+        'p-disabled':disabled,
+        'empty': value?.length == 0
+    }">
+        <li *ngFor="let item of value; let i = index" class="p-chips-token" (click)="onItemClick($event, item)">
+            <p-dropdown *ngIf="items && items.length > 0" [options]="items" [ngModel]="getModel(item)"
+                        (ngModelChange)="editItem($event, i)" [disabled]="disabled"
+            >
+                <ng-template pTemplate="selectedItem">
+                    <a (click)="$event.stopPropagation()"
+                       href="{{getPrefix(item, 'typeLink') || typeLink || '' }}{{getValue(item)}}" [attr.target]="targetLink">
+                        <span class="pi-text" *ngIf="items && items[0]?.text">{{getPrefix(item, 'text')}}</span>
+                        <span class="text">{{mask.length ? (getValue(item) | mask: mask): getValue(item)}}</span>
+                    </a>
+                </ng-template>
+                <ng-template let-sel pTemplate="item">
+                    <div class="element-item">
+                        <i class="pi {{sel.icon}}" *ngIf="sel.icon"></i>
+                        <div>{{sel.label}}</div>
+                    </div>
+                </ng-template>
+            </p-dropdown>
+            <a *ngIf="(items || []).length == 0" class="text" [attr.target]="targetLink"
+               href="{{typeLink || '' }}{{getValue(item)}}"
+            >
+                {{mask.length ? (getValue(item) | mask: mask): getValue(item)}}
+            </a>
+            <span *ngIf="items && items.length > 0" class="p-dropdown-trigger-icon pi pi-chevron-down" (click)="showDropdown(i, $event)"></span>
+            <span *ngIf="!disabled" class="p-chips-token-icon pi pi-times" (click)="removeItem($event,i)"></span>
+        </li>
+        <li class="p-chips-input-token">
+            <input #inputtext type="text" [(ngModel)]="text" [disabled]="disabled"
+                   [attr.placeholder]="(value || '').length == 0 ? placeholder : 'Добавить ...' "
+                   (keydown)="onKeydown($event)"
+                   (input)="onInput()"
+                   mask="{{mask}}"
+                   (paste)="onPaste($event)"
+                   [attr.aria-labelledby]="ariaLabelledBy" (focus)="onInputFocus($event)" (blur)="onInputBlur($event)"
+            >
+        </li>
+    </ul>
+</div>

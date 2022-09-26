@@ -1,0 +1,12 @@
+<span class="p-input-icon-right">
+    <p-autoComplete [(ngModel)]="value" [suggestions]="list" [minLength]="minLength" [field]="field"
+                    (completeMethod)="getList($event)" (onSelect)="setValue($event)" [disabled]="disabled"
+                    [class.p-disabled]="!editable" [placeholder]="placeholder" scrollHeight="320px"
+    >
+        <ng-template let-item pTemplate="item">
+            <div [innerHTML]="getInner(item)"></div>
+        </ng-template>
+    </p-autoComplete>
+    <i class="pi pi-times" (click)="setValue('')"></i>
+</span>
+

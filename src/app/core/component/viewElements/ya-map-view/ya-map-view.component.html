@@ -1,0 +1,231 @@
+<div class="container" [style.width]="config.width" [style.height]="config.height">
+    <p-sidebar [visible]="this.sidebar.open" appendTo="body" position="right" *ngIf="this.fullscreen"
+               [modal]=false [baseZIndex]="10000"
+               (onHide)="hideSidebar()" styleClass="map-sidebar tab-sidebar">
+        <ng-container [ngSwitch]="this.sidebar.data.type">
+            <div class="title">
+                <ng-container *ngSwitchCase="'mainPlacemark'">{{mainPlacemarkLabel}}</ng-container>
+                <ng-container *ngSwitchCase="'point'">
+                    <ng-container [ngSwitch]="this.sidebar.data.subtype">
+                        <ng-container *ngSwitchCase="'stop'">{{ stopTypes[this.sidebar.data.info!.stopType]?.labelShort }}</ng-container>
+                        <ng-container *ngSwitchCase="'address'">Выбранный адрес</ng-container>
+                        <ng-container *ngSwitchCase="'business'">Объект инфраструктуры</ng-container>
+                    </ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="'area'">Выделенная локация</ng-container>
+                <ng-container *ngSwitchCase="'objectList'">{{this.displayMode == 'definition' ? 'Список' : 'Список локаций и адресов'}}</ng-container>
+            </div>
+            <div class="body">
+                <ng-container *ngSwitchCase="'point'" [ngTemplateOutlet]="point"></ng-container>
+                <ng-container *ngSwitchCase="'area'" [ngTemplateOutlet]="area"></ng-container>
+                <ng-container *ngSwitchCase="'mainPlacemark'" [ngTemplateOutlet]="mainPlacemark"></ng-container>
+                <ng-container *ngSwitchCase="'objectList'" [ngTemplateOutlet]="objectList"
+                              [ngTemplateOutletContext]="{$implicit: mainListParams}"></ng-container>
+            </div>
+        </ng-container>
+        <ng-template #area>
+            <div class="block big-font">
+                <label>Название</label>
+                <textarea rows="1" cols="30" pInputTextarea [autoResize]="true" [(ngModel)]="this.sidebar.data.name"
+                          placeholder="Введите название области ..." (ngModelChange)="this.checkSave('area')"
+                ></textarea>
+                <textarea rows="1" cols="30" pInputTextarea [autoResize]="true" [(ngModel)]="this.sidebar.data.description"
+                          placeholder="Введите описание области ..." (ngModelChange)="this.checkSave('area')"
+                ></textarea>
+            </div>
+            <hr>
+            <div class="block">
+                <label>Заметка</label>
+                <textarea rows="1" cols="30" pInputTextarea [autoResize]="true" [(ngModel)]="this.sidebar.data.notice"
+                          placeholder="Добавьте заметку ..." style="max-height: 800px"
+                          (ngModelChange)="this.checkSave('area')"
+                ></textarea>
+            </div>
+            <hr class="short">
+            <div *ngIf="sidebar.data.dateCreate" class="date">Создано: {{ sidebar.data.dateCreate | mDate }}</div>
+            <ng-container *ngTemplateOutlet="savePanel; context: {$implicit: getSaveParams('area')} "></ng-container>
+        </ng-template>
+        <ng-template #point>
+            <div class="block big-font">
+                <label [ngSwitch]="sidebar.data.subtype">
+                    <ng-container *ngSwitchCase="'address'">Адрес</ng-container>
+                    <ng-container *ngSwitchCase="'business'">Название объекта инфраструктуры</ng-container>
+                    <ng-container *ngSwitchDefault>Название {{sidebar.data.info!.stopType == 'urban' ? 'остановки' :
+                        sidebar.data.info!.stopType == 'underground' ? 'станции метро' : 'железнодорожной станции'}}
+                    </ng-container>
+                </label>
+                <textarea rows="1" cols="30" pInputTextarea [autoResize]="true" [(ngModel)]="sidebar.data.name"
+                          placeholder="Введите название ..." style="max-height: 800px"
+                          (ngModelChange)="this.checkSave('point')"
+                ></textarea>
+                <ng-container *ngIf="sidebar.data?.info?.stopType == 'underground'; else textarea">
+                    <div class="metro-line description">
+                            <span *ngIf="sidebar.data.info?.undergroundData?.color"
+                                  [style.backgroundColor]="sidebar.data.info?.undergroundData?.color"
+                            ></span>
+                        {{sidebar.data.info?.undergroundData?.name}}
+                    </div>
+                </ng-container>
+                <ng-template #textarea>
+                    <textarea rows="1" cols="30" pInputTextarea [autoResize]="true" [(ngModel)]="sidebar.data.description"
+                              placeholder="Введите описание ..." style="max-height: 800px"
+                              (ngModelChange)="this.checkSave('point')"
+                    ></textarea>
+                </ng-template>
+            </div>
+            <hr>
+            <div class="block">
+                <label>Заметка</label>
+                <textarea rows="1" cols="30" pInputTextarea [autoResize]="true" [(ngModel)]="this.sidebar.data.notice"
+                          (ngModelChange)="this.checkSave('point')"
+                          placeholder="Добавьте заметку ..." style="max-height: 800px"
+                ></textarea>
+            </div>
+            <hr class="short">
+            <div *ngIf="sidebar.data.dateCreate" class="date">Создано: {{ sidebar.data.dateCreate | mDate }}</div>
+            <ng-container *ngTemplateOutlet="savePanel; context: {$implicit: getSaveParams('point')} "></ng-container>
+        </ng-template>
+        <ng-template #mainPlacemark>
+            <div class="block big-font">
+                <label>Адрес</label>
+                <div style="padding-bottom: 6px; margin-top: 0; line-height: 21px">{{_mainPlacemark.name}}</div>
+                <textarea rows="1" cols="30" pInputTextarea [autoResize]="true" style="font-size: 14px; padding-top: 0px;" [(ngModel)]="_mainPlacemark.description"
+                          placeholder="Введите название жилого комплекса ..."
+                ></textarea>
+            </div>
+            <hr>
+            <div class="block">
+                <label>Заметка</label>
+                <textarea rows="1" cols="30" pInputTextarea [(ngModel)]="_mainPlacemark.notice"
+                          [autoResize]="true" placeholder="Добавьте заметку ..." ></textarea>
+            </div>
+            <hr class="short">
+            <div class="objects">
+                <div class="sub-form">Похожие сделки <span class="link">Показать в таблице</span></div>
+                <app-more-less-view [elementSize]="6" [maxLines]="4" [lineHeight]="50">
+                    <div *ngFor="let data of [0, 1, 2, 3, 4, 5]" class="stop">
+                        <div>Сделка {{ data }}</div>
+                        <div>Описание сделки</div>
+                    </div>
+                </app-more-less-view>
+                <div class="sub-form">Другие сделки <span class="link">Показать в таблице</span></div>
+                <app-more-less-view [elementSize]="6" [maxLines]="4" [lineHeight]="50">
+                    <div *ngFor="let data of [0, 1, 2, 3, 4, 5]" class="stop">
+                        <div>Сделка {{ data }}</div>
+                        <div>Описание сделки</div>
+                    </div>
+                </app-more-less-view>
+            </div>
+        </ng-template>
+        <ng-template #objectList let-params>
+            <div class="objects" *ngIf="params.displayMainPlacemark">
+                <div class="sub-form">{{mainPlacemarkLabel}}</div>
+                <app-geo-billet (mouseenter)="deactivateAll(_mainPlacemark)" (mouseleave)="deactivateAll()" (click)="select(_mainPlacemark)"
+                                [data]="_mainPlacemark" (delete)="deleteBillet($event)"
+                ></app-geo-billet>
+            </div>
+            <div class="objects" *ngIf="(params.structures[0].array.length || params.structures[1].array.length) > 0; else emptyLabel">
+                <ng-container *ngFor="let structure of params.structures">
+                    <div class="sub-form">{{structure.label}}</div>
+                    <app-more-less-view [elementSize]="structure.array.length" [maxLines]="4" [lineHeight]="50">
+                        <app-geo-billet *ngFor="let data of structure.array" [data]="data" (delete)="deleteBillet($event)"
+                                        (click)="select(data)" (mouseleave)="deactivateAll()" (mouseenter)="deactivateAll(data)"
+                        ></app-geo-billet>
+                    </app-more-less-view>
+                </ng-container>
+            </div>
+            <ng-template #emptyLabel>
+                <div class="empty-objects">{{params.emptyText}}</div>
+            </ng-template>
+        </ng-template>
+        <ng-template #savePanel let-data>
+            <div class="button-container">
+                <button pButton type="button" [label]="data.saveLabel" class="p-button-green"
+                        [ngClass]="data.actionClass" (click)="data.saveAction(data.element, data.removeArray)"></button>
+                <button pButton type="button" [label]="data.cancelLabel" [ngClass]="'p-button-outlined'"
+                        (click)="data.cancelAction(data.element)"
+                ></button>
+            </div>
+        </ng-template>
+    </p-sidebar>
+    <ya-map [center]="[55.751952, 37.600739]" [state]="state" (ready)="ready($event)"
+        (balloonopen)="click()" (yamouseup)="click()" [options]="{yandexMapDisablePoiInteractivity: false}"
+    >
+        <app-ya-control type="FullscreenControl" (click)="exitMap()"
+                        [parameters]="{state: {enabled: true, selected: fullscreen}}"></app-ya-control>
+<
+        <ya-placemark [geometry]="_mainPlacemark.coordinates" *ngIf="_mainPlacemark.coordinates.length > 0"
+                      [options]="{type: 'placemarkHome', iconColor: placemarksColors.placemarkHome.inactive, preset: 'islands#blueHomeCircleIcon'}"
+                      (yaclick)="select(_mainPlacemark)"
+        ></ya-placemark>
+
+        <ya-placemark *ngFor="let stop of this.nearPoints"
+                      [geometry]="stop.coordinates"
+                      [options]="{type: 'placemark', iconColor: placemarksColors.placemark.inactive,
+                        preset: (displayMode == 'selection' ? 'islands#blueHomeCircleIcon' : undefined) }"
+                      (yaclick)="select(stop);
+                  openSidebar('point', stop)"
+        ></ya-placemark>
+        <ya-placemark *ngIf="tempPoint" [geometry]="tempPoint"
+                      [options]="{type: 'placemarkTemp', iconColor: placemarksColors.placemarkTemp.inactive}"
+        ></ya-placemark>
+        <app-ya-geocollection [collection]="searchZones" (click)="openDrawZone($event, 'array')" [style]="placemarksColors.area"
+        ></app-ya-geocollection>
+        <ng-container *ngIf="fullscreen">
+            <app-ya-control type="Button"
+                            [(selected)]="buttons!.list" (selectedChange)="openListBar($event)"
+                            [parameters]="{
+                                data: {class: 'button square-button pi pi-bars'},
+                                options: { position: {top: 20, left: 30}}
+                            }"
+            ></app-ya-control>
+            <app-ya-control type="Button" (click)="buttons.panorama = !buttons.panorama"
+                            [parameters]="{
+                                data: {content: buttons!.panorama ? 'Отменить': 'Панорама', class: 'left button long-button'},
+                                options: { position: {top: 20, left: 64}}
+                            }"
+            ></app-ya-control>
+            <app-ya-control type="Button" (click)="coordinates = []" [(selected)]="buttons!.draw"
+                            [parameters]="{
+                                data: {content: buttons!.draw ? 'Отменить': 'Выделить', class: 'middle button long-button'},
+                                options: { position: {top: 20, left: 173}},
+                                state: {enabled: displayMode == 'selection'}
+
+                            }"
+            ></app-ya-control>
+            <app-ya-control type="Button" (click)="buttons.routes = !buttons.routes"
+                            [parameters]="{
+                                data: {content: buttons!.routes ? 'Отменить': 'Маршруты', class: 'right button long-button'},
+                                options: { position: {top: 20, left: 173 + 109 }}
+                            }"
+            ></app-ya-control>
+            <app-ya-search [parameters]="{
+                                type: 'placemarkSearch', iconColor: placemarksColors.placemark.inactive,
+                                iconActiveColor: placemarksColors.placemark.active,
+                                options: {
+                                    noPlacemark: true, noPopup: true, noSelect: true, kind: 'metro',
+                                    position: {top: 20, left: 282 + 109 },
+                                    preset: (displayMode == 'selection' ? 'islands#blueHomeCircleIcon' : undefined)
+                                }
+                           }"
+                           (addPoint)="openSearchPoint($event)"
+                           (newBounds)="requireCenterAndZoom($event)"
+                           (cleared)="hideSidebarBySearch()"
+            ></app-ya-search>
+<!--            <app-ya-chips [(chips)]="chips" [newChip]="newChip" (selected)="showOnMap($event)" (deleted)="clearMap($event)"-->
+<!--                          [parameters]="{ options: { position: {top: 65, left: 30}}}"-->
+<!--            ></app-ya-chips>-->
+            <app-ya-control type="RoutePanel" *ngIf="buttons.routes" [parameters]="{
+                state: { from: _mainPlacemark.description},
+                options: { maxWidth: '350px', position: {top: 54, left: 281}}
+            }"
+            ></app-ya-control>
+            <app-ya-draw [drawEnabled]="buttons!.draw" [(coordinates)]="coordinates"
+                         (click)="openDrawZone($event)"
+                         (coordinatesChange)="openDrawZone($event)" [style]="placemarksColors.area"
+                         *ngIf="displayMode == 'selection'"
+            ></app-ya-draw>
+        </ng-container>
+        <app-ya-panorama [active]="buttons.panorama"></app-ya-panorama>
+    </ya-map>
+</div>

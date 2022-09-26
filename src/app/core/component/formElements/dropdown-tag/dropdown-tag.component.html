@@ -1,0 +1,17 @@
+
+<p-multiSelect [options]="tags" [(ngModel)]="value" scrollHeight="315px" [showToggleAll]="false" [filter]="false"
+               (onChange)="change($event)" optionValue="id" [appendTo]="appendTo" [defaultLabel]="label"
+               panelStyleClass="multiselect-tag" placeholder="Выберите теги ..."
+>
+    <ng-template let-tags pTemplate="selectedItems">
+        <app-tags-view [value]="tags" *ngIf="!onlyDropdown && tags?.length > 0"></app-tags-view>
+        <div *ngIf="onlyDropdown || tags?.length == 0" class="placeholder">{{label}}</div>
+    </ng-template>
+    <ng-template let-tag pTemplate="item">
+        <div class="dropdownTag">
+            <div [style.backgroundColor]="tag?.color"></div>
+            <span>{{tag.label}}</span>
+        </div>
+    </ng-template>
+</p-multiSelect>
+

@@ -1,0 +1,4 @@
+<a *ngFor="let val of value" class="text" href="{{items[val.type!]?.typeLink || typeLink || '' }}{{getValue(val)}}" [attr.target]="targetLink">
+    <span *ngIf="items[val.type!]?.text">{{items[val.type!].text}} </span>
+    <span>{{mask.length ? (getValue(val) | mask: mask): getValue(val)}}</span>;
+</a>

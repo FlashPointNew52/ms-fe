@@ -1,0 +1,372 @@
+@import "src/assets/styles/variables";
+
+
+app-entity-view, app-deal-view  {
+
+    ::ng-deep .pane {
+        display: block;
+        float: left;
+        width: 370px;
+        height: calc(100vh - 89px);
+        overflow: scroll;
+    }
+
+}
+
+.head {
+    width: 100%;
+    height: 86px;
+    margin-bottom: 1px;
+    display: flex;
+    background-color: white;
+    align-items: center;
+    color: $color-black-ever-lighter;
+
+
+    & > span {
+        font-size: 22px;
+        display: block;
+        margin: 0 30px 0;
+        line-height: 23px;
+        text-transform: uppercase;
+        height: 22px;
+        width: 170px;
+    }
+}
+
+.underline {
+    border: 0;
+    background-color: $color-tab;
+    position: absolute;
+    top: 79px;
+    left: 0;
+    width: 100vw;
+    height: 1px;
+}
+
+.progress_bar {
+    background-color: var(--color-red);
+}
+
+.pane {
+    width: 370px;
+    left: 0;
+    height: calc(100% - 89px);
+    position: absolute;
+    z-index: 4;
+    background-color: white;
+    overflow-y: auto;
+
+
+    .edit_ready {
+        cursor: pointer;
+    }
+}
+.work-area {
+    height: calc(100% - 89px);
+    width: calc(100% - 370px);
+    align-content: flex-start;
+    position: absolute;
+    left: 370px;
+    overflow: hidden;
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    ::ng-deep {
+        p-tabview{
+            height: 100%;
+
+            .p-tabview{
+                width: 370px;
+                height: 100%;
+                border-left: 1px solid #e6ebf0;
+            }
+        }
+    }
+
+    .centralView{
+        width: calc(100% - 370px);
+        height: 100%;
+        float: right;
+        overflow: auto;
+        background: $color-light1;
+
+        .work-area-header{
+            height: 130px;
+            padding: 18px 20px 5px;
+            position: relative;
+
+            &.mini{
+                position: fixed;
+                width: calc(100% - 387px*2);
+                top: 89px;
+                background: $color-light1;
+                height: 78px;
+                display: none;
+                z-index: 100;
+            }
+
+            .stage-panel{
+                width: 100%;
+                height: 53px;
+
+                ::ng-deep .stage-name{
+                    color: $color-black;
+                    width: 525px;
+
+                    span{
+                        font-size: 11px;
+                        color: $color-black-ever-lighter;
+                    }
+                }
+
+                & > div{
+                    font-size: $font-size-small;
+                    color: $color-black-ever-lighter;
+                }
+            }
+
+            .p-button{
+                @extend %button;
+                @include button-outline($color-blue, $color-blue, $color-blue);
+                width: 100px;
+                position: absolute;
+                top: 19px;
+                right: 18px;
+                border-radius: 2px;
+
+                &.active{
+                    background-color: $color-blue;
+                    color: white;
+
+                    &:hover{
+                        background-color: white;
+                        color: $color-blue;
+                    }
+                }
+
+
+            }
+
+            .panel{
+                width: 100%;
+                height: 40px;
+                position: relative;
+                line-height: 17px;
+
+                & > span{
+                    font-weight: bold;
+                    font-size: 18px;
+                    color: $color-black-ever-lighter;
+                }
+
+                .filters {
+                    margin-top: 5px;
+
+                    span {
+                        color: $color-black;
+                        font-size: $font-size-small;
+                        margin-right: 10px;
+                        display: inline-flex;
+                        align-items: center;
+                        height: 26px;
+                        border: 1px solid transparent;
+
+                        &.chips {
+                            background-color: white;
+                            border-radius: 14px;
+                            padding: 0 7px 0 0;
+                            border-color: $color-blue-light;
+
+                            ::ng-deep app-dropdown-tag .p-multiselect {
+                                .placeholder {
+                                    color: $color-blue-dark;
+                                }
+                            }
+
+
+                            i {
+                                margin-left: 5px;
+                                cursor: pointer;
+                                font-size: 12px;
+
+                                &:hover {
+                                    color: $color-blue-dark;
+                                }
+                            }
+
+                        }
+                    }
+
+                    ::ng-deep {
+                        app-dropdown-tag .p-multiselect {
+                            width: auto;
+                            height: 24px;
+                            line-height: 24px;
+                            font-size: 11px;
+                            background-color: transparent;
+                            border: none;
+
+                            .placeholder {
+                                color: $color-black;
+                            }
+                        }
+
+                        app-dropdown p-dropdown {
+
+                            .p-dropdown{
+                                font-size: $font-size-small;
+                                color: $color-black;
+                                border: 1px solid transparent !important;
+                                padding: 0;
+                                height: 26px;
+                                line-height: 25px;
+                            }
+
+
+                            &.p-inputwrapper-filled .p-dropdown{
+                                background-color: white;
+                                border-radius: 14px;
+                                border-color: $color-blue-light !important;
+                                padding: 0 24px 0 10px;
+                                color: $color-blue-dark;
+                            }
+
+                            .p-dropdown-panel{
+                                min-width: max-content;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        &.scrolled{
+            .work-area-header.mini{
+                display: block;
+            }
+        }
+    }
+
+    .update-list{
+        padding: 0 10px;
+        width: 100%;
+        height: calc(100% - 165px);
+
+        div{
+            background-color: white;
+            width: 100%;
+            height: 100%;
+            border: 1px solid #E6EBF0;
+            margin-bottom: 10px;
+        }
+    }
+
+    .manager{
+        padding: 10px 0 20px;
+
+
+        .subheader{
+            padding: 0 25px 0 30px;
+            color: $color-black-ever-lighter;
+            font-weight: bold;
+            height: 30px;
+            line-height: 30px;
+        }
+
+        .menuPoint{
+            height: 30px;
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            padding: 0 25px 0 30px;
+
+            & > div{
+                margin-left: 10px;
+                color: $color-black;
+            }
+
+            & > span{
+                margin-left: auto;
+                color: $color-green;
+                cursor: pointer;
+                font-size: $font-size-small;
+
+                &:hover{
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        hr{
+            margin: 5px 25px 5px 30px;
+            border: none;
+            border-bottom: 1px solid #c7d5e2;
+
+            &.full{
+                margin: 5px 0;
+            }
+        }
+    }
+
+    ::ng-deep p-accordion{
+
+        .p-accordion-header{
+            border: 1px solid $color-blue-light;
+            border-top: none;
+            border-left: none;
+        }
+
+        .p-accordion-header-link{
+            .p-accordion-toggle-icon{
+                margin-left: 25px;
+            }
+
+            & > div{
+                height: 60px;
+                padding: 0 30px 0 20px;
+                width: calc(100% - 20px);
+                line-height: 60px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: space-between;
+
+                div{
+                    color: $color-black-ever-lighter;
+                    font-weight: bold;
+                }
+
+                .pi{
+                    color: $color-green;
+                    font-weight: bold;
+                    width: 28px;
+                    height: 28px;
+                    text-align: center;
+                    line-height: 28px;
+                    border-radius: 25px;
+
+                    &:hover{
+                        background-color: $color-grey2;
+                    }
+                }
+            }
+        }
+
+        .p-accordion-content{
+            .no-context {
+                width: 100%;
+                padding: 20px 30px;
+                color: $color-black;
+                line-height: 17px;
+                //height: 300px;
+                border-bottom: 1px solid $color-blue-light;
+                background-color: $color-light1;
+            }
+        }
+    }
+}
+
+.green{
+    color: $color-green;
+}

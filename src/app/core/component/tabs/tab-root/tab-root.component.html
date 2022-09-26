@@ -1,0 +1,97 @@
+<p-tabView styleClass="mainTabs" [activeIndex]="selected" (activeIndexChange)="changeTab($event)" (onClose)="closeTab($event)">
+    <div class="avatar_panel">
+        <button pButton pRipple type="button" icon="pi pi-search" class="p-button-rounded" (click)="sidebar = 1"></button>
+        <button pButton pRipple type="button" icon="pi pi-calendar" class="p-button-rounded" (click)="sidebar = 2"></button>
+        <button pButton pRipple type="button" icon="pi pi-comments" class="p-button-rounded" (click)="sidebar = 3"></button>
+        <button pButton pRipple type="button" icon="pi pi-bell" class="p-button-rounded" (click)="sidebar = 4"></button>
+        <p-avatar icon="pi pi-user" styleClass="p-mr-2" size="large" shape="circle" (click)="logout()"></p-avatar>
+        <p-sidebar [visible]="sidebar > 0" appendTo="body" position="right" [modal]=false [baseZIndex]="10000" (onHide)="sidebar=0" styleClass="tab-sidebar">
+            <ng-container *ngIf="sidebar > 1  else search">
+                <div class="sidebar-header">
+                    <span>{{sidebar == 1 ? "Чат" : "Ежедневник"}}</span>
+                </div>
+            </ng-container>
+            <ng-template #search>
+                <div class="sidebar-header">
+                    <input class="filter" placeholder="Поиск группы, списка ...">
+                </div>
+                <p-listbox optionLabel="header" [group]="true" [multiple]="true"  [checkbox]="true" [group]="true" [showToggleAll]="false"
+                           [options]="[
+                       {
+                            label: 'Контакты', value: 'persons',
+                            items: []
+                       },
+                       {
+                            label: 'Пользователи', value: 'users',
+                            items: []
+                       },
+                       {
+                            label: 'Компании', value: 'organosations',
+                            items: []
+                       },
+                       {
+                            label: 'Сделка Прайс (Прайс и импорт)', value: 'dealAll',
+                            items: []
+                       },
+                       {
+                            label: 'Сделка Наша компания', value: 'dealOur',
+                            items: []
+                       },
+                   ]" [ngModel]="[]"
+                >
+                    <ng-template let-group pTemplate="group">
+                        <div>
+                            <span>{{group.label}}</span>
+                        </div>
+                    </ng-template>
+                </p-listbox>
+            </ng-template>
+        </p-sidebar>
+    </div>
+    <p-tabPanel header="" headerStyleClass="homeTabPanel">
+        <ng-template pTemplate = "header">
+            <div >
+                <p-menu #menu [popup]="true" [model]="tabsMenu"></p-menu>
+                <button type="button" pButton icon="pi pi-bookmark" (click)="menu.toggle($event); $event.stopPropagation()"></button>
+                <i class="pi pi-plus" (click)="changeTab(0)"></i>
+            </div>
+
+        </ng-template>
+        <ng-template pTemplate="content">
+            <app-main-tab></app-main-tab>
+        </ng-template>
+    </p-tabPanel>
+    <p-tabPanel header="{{tab.header}}" *ngFor="let tab of tabs" headerStyleClass="mainTabPanel" [closable]="true">
+        <ng-template pTemplate = "header">
+<!--            <div class="tag" [style.background-color]="tab.args?.entity?.tag | tag:'color'"></div>-->
+            <span>{{tab.header}}</span>
+        </ng-template>
+        <ng-template pTemplate="content {{tab.header}}" [ngSwitch]="tab.typeTab">
+            <app-person-list-tab [tab]="tab" *ngSwitchCase="tabTypes.PERSON_LIST"></app-person-list-tab>
+            <app-person-tab [tab]="tab" *ngSwitchCase="tabTypes.PERSON"></app-person-tab>
+            <app-company-list-tab [tab]="tab" *ngSwitchCase="tabTypes.COMPANY_LIST"></app-company-list-tab>
+            <app-company-tab [tab]="tab" *ngSwitchCase="tabTypes.COMPANY"></app-company-tab>
+            <app-deal-list-tab [tab]="tab" *ngSwitchCase="tabTypes.DEAL_LIST"></app-deal-list-tab>
+            <app-deal-tab [tab]="tab" *ngSwitchCase="tabTypes.DEAL"></app-deal-tab>
+        </ng-template>
+    </p-tabPanel>
+</p-tabView>
+
+
+<!--<tab-main [tab]="tab" *ngSwitchCase="'main'"></tab-main>-->
+<!--<tab-list-offer [tab]="tab" *ngSwitchCase="'list_offer'"></tab-list-offer>-->
+<!--<tab-offer [tab]="tab" *ngSwitchCase="'offer'" ></tab-offer>-->
+<!--<tab-list-person [tab]="tab" *ngSwitchCase="'list_person'"></tab-list-person>-->
+<!--<tab-person [tab]="tab" *ngSwitchCase="'person'"></tab-person>-->
+<!--<tab-list-organisation [tab]="tab" *ngSwitchCase="'list_organisation'"></tab-list-organisation>-->
+<!--<tab-organisation [tab]="tab" *ngSwitchCase="'organisation'"></tab-organisation>-->
+<!--<tab-list-request [tab]="tab" *ngSwitchCase="'list_request'"></tab-list-request>-->
+<!--<tab-request [tab]="tab" *ngSwitchCase="'request'"></tab-request>-->
+<!--<tab-advertising [tab]="tab" *ngSwitchCase="'advertising'"></tab-advertising>-->
+<!--<tab-list-user [tab]="tab" *ngSwitchCase="'list_users'"></tab-list-user>-->
+<!--<tab-user [tab]="tab" *ngSwitchCase="'user'"></tab-user>-->
+<!--<tab-list-activity [tab]="tab" *ngSwitchCase="'list_activity'"></tab-list-activity>-->
+<!--<tab-activity [tab]="tab" *ngSwitchCase="'activity'"></tab-activity>-->
+<!--<tab-daily [tab]="tab" *ngSwitchCase="'daily'"></tab-daily>-->
+<!--<tab-config [tab]="tab" *ngSwitchCase="'config'"></tab-config>-->
+<!--<div *ngSwitchDefault>tab.type == {{ tab.type }}</div>-->

@@ -1,0 +1,26 @@
+<div class="p-inputwrapper"
+     [class.p-inputwrapper-filled]="value && (value.constructor.name == 'Date' || value.length > 0)"
+     [class.p-inputwrapper-focus]="focus"
+>
+    <p-calendar [(ngModel)]="value" [dateFormat]="dateFormat || ''" [placeholder]="placeholder"
+                [selectionMode]="selectionMode" [view]="view" (onSelect)="change($event)" #calendar
+                [firstDayOfWeek]="1" showTransitionOptions="0s" hideTransitionOptions="0s" [readonlyInput]="true"
+                (onClose)="stateEvent($event)" (onShow)="stateEvent($event)"
+    >
+    <ng-template pTemplate="header">
+        <div class="quarter" *ngIf="calendar.currentView == 'month'">
+            <span>I кв</span>
+            <span>II кв</span>
+            <span>III кв</span>
+            <span>IV кв</span>
+        </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <div class="footer" *ngIf="view == 'month'" >
+            <div>Отображать как квартал<p-inputSwitch [(ngModel)]="asQuartet" (onChange)="update()"></p-inputSwitch></div>
+        </div>
+    </ng-template>
+    </p-calendar>
+    <i class="pi pi-times" *ngIf="value && (value.constructor.name == 'Date' || value.length > 0)"
+       (click)="calendar.onClearButtonClick($event); change($event)"></i>
+</div>

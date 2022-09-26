@@ -1,0 +1,13 @@
+<p-inputSwitch [(ngModel)]="signupForm.isOrg">Зарегистрироваться как организация</p-inputSwitch>
+<input type="text" *ngIf="signupForm.isOrg" pInputText placeholder="НАЗВАНИЕ ОРГАНИЗАЦИИ" [(ngModel)]="signupForm.orgName">
+<input type="text" pInputText placeholder="ФАМИЛИЯ" [(ngModel)]="signupForm.userLastName">
+<input type="text" pInputText placeholder="ИМЯ И ОТЧЕСТВО" [(ngModel)]="signupForm.userName">
+<input type="text" [(ngModel)]="signupForm.phone" placeholder="ТЕЛЕФОН"
+       mask="+0 (000) 000-00-00"
+>
+<input [(ngModel)]="signupForm.email" placeholder="E-MAIL">
+<div>
+    <p-checkbox [(ngModel)]="signupForm.agreement"></p-checkbox>
+    <span>Я согласен с условиями использования и политикой конфиденциальности</span>
+</div>
+<input class="submit" type="submit" value="ЗАРЕГИСТРИРОВАТЬСЯ" (click)="registr()">

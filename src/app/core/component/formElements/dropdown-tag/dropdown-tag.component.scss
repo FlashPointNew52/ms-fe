@@ -1,0 +1,106 @@
+@import "src/assets/styles/variables";
+@import "../stylesForm";
+
+.dropdownTag{
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+
+    div{
+        width: 13px;
+        height: 13px;
+        float: left;
+        margin: 0 10px 2px 0;
+        border-radius: 10px;
+    }
+
+    span{
+        line-height: 15px;
+    }
+}
+
+.description{
+    width: 100%;
+    white-space: break-spaces;
+    margin-top: 5px;
+    font-size: $font-size-small;
+    color: $color-black;
+    line-height: 15px;
+}
+
+::ng-deep app-dropdown-tag{
+    .p-multiselect{
+        @extend %input;
+
+        &.p-multiselect-open{
+            @extend %input-focus;
+        }
+
+        .p-multiselect-panel{
+            left: -1px !important;
+            min-width: 320px;
+        }
+
+        .p-multiselect-label-container{
+            display: inline-flex;
+
+            .placeholder{
+                color: $color-blue-light1;
+            }
+
+            .p-multiselect-label {
+                display: inline-flex;
+                align-items: center;
+
+                app-tags-view{
+                    height: 18px;
+                    width: 18px;
+                }
+            }
+        }
+
+    }
+
+    .p-inputwrapper-filled .p-multiselect{
+        @extend %input-filled;
+
+        &:hover{
+            @extend %input-hover;
+        }
+    }
+
+    .p-multiselect-trigger{
+        display: none;
+    }
+
+}
+
+::ng-deep .multiselect-tag.p-multiselect-panel{
+    @include multiselect-style;
+
+    @extend %panel;
+
+    .p-multiselect-items {
+        .p-multiselect-item {
+            padding: 10px 25px;
+            flex-direction: column;
+
+            &:focus{
+                box-shadow: none;
+            }
+
+
+            &.p-highlight{
+                background: $color-blue-light !important;
+            }
+
+            &:not(.p-disabled):hover{
+                background: $color-blue-light !important;
+            }
+
+            .p-checkbox{
+                display: none;
+            }
+        }
+    }
+}

@@ -1,0 +1,155 @@
+@import "src/assets/styles/variables";
+
+.pane {
+    .face{
+        height: fit-content;
+
+        .heading{
+            font-size: 18px;
+            max-height: 62px;
+            min-height: 20px;
+            line-height: 21px;
+            margin: -3px 0 11px;
+            overflow: hidden;
+            color: $color-black;
+            max-width: 298px;
+            word-break: break-word;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            display: -webkit-box;
+            //text-align: justify;
+
+            ::ng-deep .placeholder{
+                color: $color-blue-light1;
+            }
+        }
+
+        .info{
+            height: 18px;
+            width: 100%;
+            color: $color-black-ever-lighter;
+        }
+
+        .progress{
+            margin-left: 0;
+
+            span{
+                flex-grow: 0.2;
+            }
+        }
+
+        &.mini .heading{
+            height: 42px;
+            margin: 0;
+
+            ::ng-deep .placeholder{
+                line-height: 42px;
+            }
+        }
+    }
+
+    ::ng-deep p-tabview .p-tabview.tabView {
+        .p-tabview-nav{
+            flex-wrap: nowrap;
+            border-top: 1px solid #c7d5e2;
+            height: 35px;
+
+            li{
+                border-radius: 2px;
+            }
+
+            .p-tabview-title{
+                line-height: 32px;
+            }
+        }
+        .p-tabview-panels{
+            overflow: visible;
+        }
+    }
+
+
+    .row-field{
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        height: 66px;
+        color: $color-blue-light0;
+
+        p-inputnumber {
+            width: 32%;
+            margin-right: 6px;
+        }
+
+
+        //::ng-deep
+        //
+        //    input{
+        //        position: inherit;
+        //        z-index: 5;
+        //
+        //        &.p-filled{
+        //            z-index: 0;
+        //        }
+        //
+        //        &:focus-visible, &:hover{
+        //            z-index: 10;
+        //            border-radius: 3px !important;
+        //        }
+        //
+        //        &:focus-visible{
+        //            z-index: 15;
+        //        }
+        //
+        //
+        //    }
+        //
+        //    &:first-of-type{
+        //        input{
+        //            border-top-right-radius: 0;
+        //            border-bottom-right-radius: 0;
+        //        }
+        //    }
+        //
+        //    &:not(:first-of-type){
+        //        margin-left: -1px;
+        //    }
+        //
+        //    &:not(:first-of-type):not(:last-of-type){
+        //        input{
+        //
+        //        }
+        //    }
+        //
+        //    &:last-of-type{
+        //        input{
+        //            border-top-left-radius: 0;
+        //            border-bottom-left-radius: 0;
+        //        }
+        //    }
+        //}
+    }
+
+    .main_data{
+        border-top: none;
+    }
+
+    app-more-less-view ::ng-deep{
+        .container{
+            margin-top: -8px;
+        }
+    }
+
+    app-geo-billet ::ng-deep{
+        .billet-container {
+            padding: 8px 10px;
+
+            .remove{
+                right: 5px;
+            }
+
+        }
+    }
+
+}
+
+

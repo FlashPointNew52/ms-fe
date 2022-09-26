@@ -1,0 +1,274 @@
+@import "src/assets/styles/variables";
+
+.p-inputwrapper {
+    position: relative;
+    @extend %input;
+
+    &.p-inputwrapper-filled{
+        @extend %input-filled;
+    }
+
+    &:hover{
+        @extend %input-hover;
+    }
+
+    &.p-inputwrapper-focus{
+        @extend %input-focus;
+    }
+
+
+    & > .pi{
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: none;
+
+        &:hover{
+            color: $color-blue-dark;
+        }
+    }
+
+    &:hover{
+        & > .pi{
+            display: block;
+        }
+    }
+
+    ::ng-deep p-calendar{
+        padding: 0;
+        border: none;
+
+        .p-calendar{
+            width: 100%;
+            padding: 0;
+            border: 0;
+            height: 100%;
+        }
+
+        input{
+            border: none;
+            outline: none;
+            background: transparent;
+            cursor: pointer;
+            padding: 0;
+            height: calc(100% + 2px);
+            color: $color-black;
+
+            &::placeholder{
+                color: $color-blue-light1;
+            }
+        }
+
+        .p-datepicker{
+            width: calc(100% + 22px);
+            margin: -1px 0 0 -11px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #ffffff;
+            border: 0 none;
+            box-shadow: $shadow;
+            //max-width: 100%;
+            display: flex;
+            flex-direction: column;
+
+            .p-datepicker-group-container{
+                order: 1;
+            }
+            .quarter{
+                order: 2;
+                display: inline-flex;
+                justify-content: space-between;
+                margin: 10px 10px 0;
+
+                span{
+                    width: 40px;
+                    text-align: center;
+                    font-weight: bold;
+                    color: $color-black;
+
+                }
+            }
+
+            .p-datepicker-header{
+                padding: 0;
+                color: $color-black;
+                background: #ffffff;
+                font-weight: 600;
+                margin: 0;
+                border-bottom: 1px solid #dee2e6;
+                border-top-right-radius: 6px;
+                border-top-left-radius: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                .p-datepicker-prev, .p-datepicker-next{
+                    width: 40px;
+                    height: 40px;
+                    color: $color-black;
+                    border: 0 none;
+                    background: transparent;
+                    border-radius: 50%;
+                    transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+
+                    span{
+                        color: $color-black-ever-lighter1;
+                    }
+                }
+
+                .p-datepicker-title{
+                    line-height: 2rem;
+                    margin: 0 auto;
+
+                    .p-datepicker-month {
+                        margin-right: 0.5rem;
+                    }
+
+                    .p-datepicker-year{
+                        color: $color-black;
+                        transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+                        font-weight: 600;
+                        padding: 0rem;
+                    }
+
+                }
+            }
+
+            .p-monthpicker{
+                height: 143px;
+                display: flex;
+                flex-direction: column;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                order: 3;
+                align-content: space-between;
+                padding: 0 10px;
+
+                .p-monthpicker-month{
+                    display: block;
+                    max-width: 40px;
+                    height: 40px;
+                    line-height: 40px;
+                    text-align: center;
+                    border-radius: 4px;
+                    border: 1px solid transparent;
+                    color: $color-black;
+
+                    &:hover{
+                        background: $color-blue-light;
+                    }
+
+                    &.p-highlight{
+                        background: $color-black-ever-lighter1;
+                        color: $color-light1;
+                    }
+                }
+            }
+
+            .p-yearpicker{
+                order: 2;
+                display: flex;
+                flex-direction: column;
+                flex-wrap: wrap;
+                height: 88px;
+                justify-content: space-evenly;
+                align-items: center;
+
+                .p-yearpicker-year{
+                    max-width: 60px;
+                    height: 30px;
+                    line-height: 30px;
+                    text-align: center;
+                    border-radius: 4px;
+                    border: 1px solid transparent;
+                    color: $color-black-ever-lighter;
+
+                    &:hover{
+                        background: $color-blue-light;
+                    }
+
+                    &.p-highlight{
+                        background: $color-black-ever-lighter1;
+                        color: $color-light1;
+                    }
+                }
+
+            }
+
+            .footer{
+                order: 4;
+                min-height: 45px;
+                padding: 10px 15px;
+
+                & > div{
+                    color: $color-black;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+
+                    p-inputswitch{
+                        margin-left: 15px;
+                    }
+                }
+            }
+
+            table{
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 5px;
+
+                tr{
+                    width: 100%;
+                }
+
+                th span{
+                    display: block;
+                    margin-top: 10px;
+                    color: $color-black;
+                }
+
+                td{
+                    padding: 2px;
+
+                    & > span{
+                        width: 35px;
+                        height: 35px;
+                        border-radius: 4px;
+                        transition: box-shadow 0.2s;
+                        border: 1px solid transparent;
+                        color: $color-black;
+
+                        &.p-highlight{
+                            background: $color-black-ever-lighter1;
+                            color: $color-light1;
+                        }
+                    }
+
+                    &.p-datepicker-other-month > span{
+                        color: $color-tab;
+                    }
+
+                    &.p-datepicker-today > span {
+                        background: $color-green;
+                        color: $color-light1;
+                        border-color: transparent;
+                    }
+
+                    &:not(.p-datepicker-today) > span:not(.p-highlight):not(.p-disabled):hover {
+                        background: $color-blue-light;
+                    }
+
+
+                    //&:not(.p-datepicker-today) > span:not(.p-highlight):not(.p-disabled):hover {
+                    //    background: #e9ecef;
+                    //}
+                }
+
+            }
+        }
+
+    }
+}
+
+

@@ -1,0 +1,11 @@
+<input #inputtext type="text" [(ngModel)]="signinForm.phone" placeholder="ТЕЛЕФОН"
+       mask="+0 (000) 000-00-00"
+>
+<span class="p-float-label">
+    <p-password [toggleMask]="true" [(ngModel)]="signinForm.password"
+                (keydown)="checkKeyPress($event)" [feedback]="false"
+    >ПАРОЛЬ</p-password>
+</span>
+<div class="link_button" routerLink="/reset">Забыли пароль?</div>
+<input class="submit" type="submit" value="ВОЙТИ В СИСТЕМУ" (click)="login()"
+       style="margin-top: 35px">

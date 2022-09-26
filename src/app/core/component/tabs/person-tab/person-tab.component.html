@@ -1,0 +1,232 @@
+<div class="head"><span>Контакт</span></div>
+<hr class='underline'>
+<hr class='underline progress_bar'
+    [ngStyle]="{'width': progressWidth + 'vw', 'transition': progressWidth > 0 ? 'all 2s ease 0s' : 'all 0s ease 0s'}">
+<app-entity-view [entity]="entity" (entityChanges)="save($event)" [service]="personService" (deleteChanges)="delete()"></app-entity-view>
+<div class="work-area">
+    <div #centralView class="centralView" (scroll)="centralView.scrollTop > 52 ? centralView.classList.add('scrolled') : centralView.classList.remove('scrolled')">
+        <ng-template #templHeader>
+            <button pButton type="button" label="{{ viewMode == 'FULL' ? 'Свернуть' : 'Развернуть'}}" icon="pi"
+                    [class.active]="viewMode == 'FULL'" class="p-button"
+                    (click)="viewMode = (viewMode == 'FULL' ? 'SHORT' : 'FULL')"
+            ></button>
+            <div class="panel">
+                <span>{{ updatesSelected.label2 ||  updatesSelected.label }} (5)</span>
+                <div class="filters">
+                    <span>
+                        <app-dropdown [(ngModel)]="filter.date" placeholder="Дата" [usePrefix]="true" [showClear]="true"
+                                      [options]="[
+                                            {label: 'Сегодня', code: 'NEW_CONTACT', description: 'С полуночи до настоящего момента '},
+                                            {label: 'Вчера', code: 'TRANSFORMATION', description: 'Предыдущие 24 часа'},
+                                            {label: 'Позавчера', code: 'NEW_CLIENT', description: '2 дня назад с настоящего момента'},
+                                            {label: 'На этой неделе', code: 'CONST_CLIENT', description: 'Текущая календарная неделя до настоящего момента'},
+                                            {label: 'За прошлую неделю', code: 'LOYAL_CLIENT', description: 'Предыдущая календарная неделя'},
+                                            {label: '2 недели назад', code: 'PARTNER', description: 'Предыдущие две календарные недели'},
+                                            {label: '3 недели назад', code: 'PARTNER', description: 'Предыдущие три календарные недели'},
+                                            {label: 'В этом месяце', code: 'PARTNER', description: 'Текущий календарный месяц до настоящего момента'},
+                                            {label: 'За прошлый месяц', code: 'PARTNER', description: 'Предыдущий календарный месяц'},
+                                            {label: 'В этом квартале', code: 'PARTNER', description: 'Текущий календарный квартал до настоящего момента'},
+                                            {label: 'За прошлый квартал', code: 'PARTNER', description: 'Предыдущий календарный квартал'},
+                                            {label: 'В этом году', code: 'PARTNER', description: 'Текущий календарный год до настоящего момента'},
+                                            {label: 'За прошлый год', code: 'PARTNER', description: 'Предыдущий календарный год'},
+                            ]" optionLabel="label" scrollHeight="300px">
+                        </app-dropdown>
+
+                    </span>
+                    <span>Сортировка</span>
+                    <span [class.chips]="filter.tag?.length > 0">
+                        <app-dropdown-tag [onlyDropdown]="true" label="Теги" [(ngModel)]="filter.tag"></app-dropdown-tag>
+                        <ng-container *ngIf="filter.tag?.length > 0">
+                            <app-tags-view [value]="filter.tag"></app-tags-view>
+                            <i class="pi pi-times"  (click)="filter.tag = []"></i>
+                        </ng-container>
+                    </span>
+                    <span>Статус</span>
+                    <span>Прогресс</span>
+                </div>
+            </div>
+        </ng-template>
+        <div class="work-area-header mini"><ng-container *ngTemplateOutlet="templHeader"></ng-container></div>
+        <div class="work-area-header">
+            <div class="stage-panel" [innerHTML]="getStage()"></div>
+            <ng-container *ngTemplateOutlet="templHeader"></ng-container>
+
+        </div>
+
+        <div class="update-list">
+            <div>
+
+            </div>
+            <div>
+
+            </div>
+        </div>
+    </div>
+
+    <p-tabView styleClass="tabView">
+        <p-tabPanel header="Менеджер контакта">
+            <div class="manager">
+                <div class="search-line">
+                    <input type="text" class="p-inputtext" placeholder="Поиск по всем записям ...">
+                    <span class="pi pi-search"></span>
+                </div>
+                <hr class="full">
+                <div class="subheader">Статус взаимодействия</div>
+                <ng-container *ngFor="let state of filterStatesMenu">
+                    <div class="menuPoint">
+                        <p-radioButton name="stage" [value]="state.code" [label]="state.label" [(ngModel)]="filter.state"></p-radioButton>
+                    </div>
+                </ng-container>
+                <hr>
+                <div class="subheader">Стадии</div>
+                <ng-container *ngFor="let stage of filterStagesMenu">
+                    <div class="menuPoint">
+                        <p-radioButton name="stage" [value]="stage.code" [label]="stage.label" [(ngModel)]="filter.stage"></p-radioButton>
+                    </div>
+                </ng-container>
+                <hr>
+                <ng-container *ngFor="let menu of updatesPanel">
+                    <ng-container *ngIf="(menu.items || []).length == 0 && !menu.separator">
+                        <div class="menuPoint">
+                            <p-radioButton name="action" [value]="menu" [label]="menu.label" [(ngModel)]="updatesSelected"></p-radioButton>
+                            <span *ngIf="menu.withCreate" (click)="openSideBar($event, menu.label, 'extended')">Создать</span>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="(menu.items || []).length > 0">
+                        <div class="subheader">{{menu.label}}</div>
+                        <div class="menuPoint submenu" *ngFor="let submenu of menu.items" >
+                            <p-radioButton name="action" [value]="submenu" [label]="submenu.label" [(ngModel)]="updatesSelected"></p-radioButton>
+                            <span *ngIf="submenu.withCreate" (click)="openSideBar($event, submenu.label, 'extended')">Создать</span>
+                        </div>
+                    </ng-container>
+                    <hr *ngIf="menu.separator"/>
+                </ng-container>
+            </div>
+
+<!--                <p-menu [model]="updatesPanel"></p-menu>-->
+        </p-tabPanel>
+
+        <p-tabPanel header="Связано с контактом">
+            <p-accordion>
+                <p-accordionTab>
+                    <ng-template pTemplate="header">
+                        <div>
+                            <div>Компания (5)</div>
+                            <i class="pi pi-plus"
+                               (click)="openSideBar($event, 'Связать компанию с этим контактом', 'normal',
+                               'Добавьте существующую компанию или создайте новую​')"
+                            ></i>
+                        </div>
+                    </ng-template>
+                    <div class="no-context">
+                        <span>Посмотреть компанию, связанную с этим контактом. Добавьте существующую компанию или создайте новую.</span>
+                    </div>
+                </p-accordionTab>
+                <p-accordionTab>
+                    <ng-template pTemplate="header">
+                        <div>
+                            <div>Группы (5)</div>
+                            <i class="pi pi-plus" (click)="openSideBar($event, 'Связать группу с этим контактом', 'normal',
+                               'Добавьте существующую группу или создайте новую​')"></i>
+                        </div>
+                    </ng-template>
+                    <div class="no-context">
+                        <span>Участие в группах совместных проектах с другими пользователями. Добавьте существующую группу или создайте новую. </span>
+                    </div>
+                </p-accordionTab>
+                <p-accordionTab>
+                    <ng-template pTemplate="header">
+                        <div>
+                            <div>Списки (5)</div>
+                            <i class="pi pi-plus" (click)="openSideBar($event, 'Связать список с этим контактом', 'normal',
+                               'Добавьте существующий список или создайте новый')"></i>
+                        </div>
+                    </ng-template>
+                    <div class="no-context">
+                        <span>Все списки, в которые входит контакт, будут здесь. Используйте списки, чтобы сегментировать контакты.</span>
+                    </div>
+                </p-accordionTab>
+                <p-accordionTab>
+                    <ng-template pTemplate="header">
+                        <div>
+                            <div>Сделки (5)</div>
+                            <i class="pi pi-plus" (click)="openSideBar($event, 'Связать сделку с этим контактом', 'normal',
+                               'Добавьте существующую сделку или создайте новую​')"></i>
+                        </div>
+                    </ng-template>
+                    <div class="no-context">
+                        <span>Просматривайте или добавляйте сделки, связанные с этой записью. Отслеживайте возможности получение дохода.</span>
+                    </div>
+                </p-accordionTab>
+                <p-accordionTab>
+                    <ng-template pTemplate="header">
+                        <div>
+                            <div>Документы / Вложения (5)</div>
+                            <i class="pi pi-plus" (click)="openSideBar($event, 'Добавить документ/вложение')"></i>
+                        </div>
+                    </ng-template>
+                    <div class="no-context">
+                        <span>Просматривайте или добавляйте файлы, прикрепленные к вашим действиям или загруженные в эту запись.</span>
+                    </div>
+                </p-accordionTab>
+                <p-accordionTab>
+                    <ng-template pTemplate="header">
+                        <div>
+                            <div>Фото (5)</div>
+                            <i class="pi pi-plus" (click)="openSideBar($event, 'Добавить фото')"></i>
+                        </div>
+                    </ng-template>
+                    <div class="no-context">
+                        <span>Просматривайте или добавляйте фотографии, связанные с этим контактом.</span>
+                    </div>
+                </p-accordionTab>
+                <p-accordionTab>
+                    <ng-template pTemplate="header">
+                        <div>
+                            <div>Уведомления (5)</div>
+                            <i class="pi pi-plus" (click)="openSideBar($event, 'Добавить уведомление')"></i>
+                        </div>
+                    </ng-template>
+                    <div class="no-context">
+                        <span>Просматривайте  уведомления связанные с этим контактом.</span>
+                    </div>
+                </p-accordionTab>
+                <p-accordionTab>
+                    <ng-template pTemplate="header">
+                        <div>
+                            <div>Сценарии / Регламенты (5)</div>
+                            <i class="pi pi-plus" (click)="openSideBar($event, 'Добавить сценарий/регламент')"></i>
+                        </div>
+                    </ng-template>
+                    <div class="no-context">
+                        <span>Алгоритм действий по контакту</span>
+                    </div>
+                </p-accordionTab>
+            </p-accordion>
+        </p-tabPanel>
+    </p-tabView>
+</div>
+
+<p-sidebar [visible]="sidebar.open"  position="right" [modal]="true" [baseZIndex]="8500" (onHide)="sidebar.open = false"
+           [styleClass]="sidebar.mode"
+>
+    <div class="sidebar-header">
+        <span>{{ sidebar.title }}</span>
+    </div>
+    <p-tabView [activeIndex]="2" styleClass="tabView" *ngIf="sidebar.mode != 'extended'">
+        <p-tabPanel header="Выбрать из списка" [selected]="true">
+            <div class="description-text">{{ sidebar.description }}</div>
+            <div class="search-line">
+                <input type="text" class="p-inputtext" placeholder="Поиск по всем записям ...">
+                <span class="pi pi-search"></span>
+            </div>
+        </p-tabPanel>
+        <p-tabPanel header="Создать новую">
+            <div class="description-text">{{ sidebar.description }}​</div>
+            <div class="save-buttons">
+                <button pButton type="button" label="Сохранить" class="p-button-green"></button>
+                <button pButton type="button" label="Отменить" class="p-button-outlined"></button>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
+</p-sidebar>
