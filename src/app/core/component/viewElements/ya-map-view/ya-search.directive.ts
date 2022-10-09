@@ -270,6 +270,4 @@ export class YaSearchDirective implements OnInit, OnChanges, OnDestroy{
             }
         }
     }
-
-
 }

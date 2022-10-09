@@ -43,7 +43,7 @@
     ></app-search-panel>
     <label>{{addressType == 'apartment' ? 'Номер квартиры' : 'Номер помещения'}}</label>
     <app-simple-input formControlName="apartment"
-                      [placeholder]="Введите номер ..."
+                      placeholder="Введите номер ..."
                       [disabled]="!addressStructure.building.name || addressStructure.building.name!.length == 0"
     ></app-simple-input>
     <label>Административный район</label>

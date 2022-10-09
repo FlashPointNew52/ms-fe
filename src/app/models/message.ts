@@ -15,4 +15,5 @@ export class Message implements IMessage{
         this.text = text;
         this.type = type;
     }
+
 }

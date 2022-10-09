@@ -79,6 +79,7 @@ export class YaGeoCollectionDirective implements OnInit,DoCheck, OnDestroy{
         if (changes) {
             let i = 0;
             changes.forEachRemovedItem(el => {
+
                 //@ts-ignore
                 this._collection?.splice(el.previousIndex-i, 1);
                 i++;
