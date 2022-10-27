@@ -1,0 +1,71 @@
+<p-sidebar [(visible)]="sidebar.visible" position="left" [modal]=false [baseZIndex]="8500"
+           styleClass="tab-sidebar big">
+    <div class="sidebar-header">НАСТРОЙКА ПОЛЕЙ</div>
+    <div class="sidebar-body field-customizer">
+        <div class="tabs">
+            <div class="subheader">ПРОДАЖА - 2 КОМНАТНОЙ КВАРТИРЫ, ПО УЛ. ПАВЛА ЛЕОНТЬЕВИЧА МОРО... 
+            </div>
+            <div *ngFor="let param of fields | keyvalue: utils.originalOrder" class="tab">
+                <p-radioButton [value]="param.key" [(ngModel)]="currentChapter" [label]="param.value.label"
+                               labelStyleClass="before-radio"
+                ></p-radioButton>
+            </div>
+        </div>
+        <div class="side left">
+            <div class="section-container"
+                 *ngFor="let section of fields[currentChapter]?.sections | keyvalue: utils.originalOrder"
+            >
+                <div class="section-name">{{section.value?.label}}</div>
+                <div *ngFor="let option of section.value?.array" class="column-name"
+                     (click)="sidebar.openPage(1, {field: option, section: section.key, new: true}) "
+                >{{option.label}}</div>
+            </div>
+        </div>
+        <div class="side right">
+            <ng-container *ngIf="sidebar.page == 0; else more">
+                <div class="description">Эти поля появятся при просмотре информации о сделке. Вы можете изменить их
+                    последовательность перетащив нужное</div>
+                <ng-container *ngFor="let section of selected[currentChapter] | keyvalue: utils.originalOrder">
+                    <p-orderList *ngIf="section.value.length > 0"
+                            [header]="fields[currentChapter].sections[section.key].label"
+                            [value]="section.value" [dragdrop]="true" class="selected-fields"
+                    >
+                        <ng-template let-field pTemplate="item">
+                            <div class="selected-field">{{field.label}}
+                                <span >
+                                    <i class="pi pi-cog" (click)="sidebar.openPage(1, {field: field, section: section.key, new: false })"></i>
+                                    <i class="pi pi-times" (click)="remove(section.key, field)"></i>
+                                </span>
+                            </div>
+                        </ng-template>
+                    </p-orderList>
+                </ng-container>
+
+
+            </ng-container>
+            <ng-template #more>
+                <div class="field-configurator">
+                    <button (click)="sidebar.openPage(0, {})" class="back">
+                        <i class="pi pi-chevron-left"></i>Назад
+                    </button>
+                    <label>{{sidebar.data.field.label}}</label>
+                    <hr>
+                    <p-radioButton label="Стандартно" [value]="1" [(ngModel)]="radio"></p-radioButton>
+                    <p-radioButton label="Текстовое поле" [value]="2" [(ngModel)]="radio"></p-radioButton>
+                    <p-radioButton label="Числовое поле" [value]="3" [(ngModel)]="radio"></p-radioButton>
+                    <p-radioButton label="Числовой промежуток" [value]="4" [(ngModel)]="radio"></p-radioButton>
+                    <p-radioButton label="Календарь с одной датой" [value]="5" [(ngModel)]="radio"></p-radioButton>
+                    <p-radioButton label="Временной промежуток" [value]="6" [(ngModel)]="radio"></p-radioButton>
+                    <p-radioButton label="Комментарий" [value]="7" [(ngModel)]="radio"></p-radioButton>
+                    <ng-container *ngIf="sidebar.data.new; else panel">
+                        <button (click)="addField()">Добавить</button>
+                    </ng-container>
+                   <ng-template #panel>
+                       <button>Изменить</button>
+                       <button (click)="remove(sidebar.data.section, sidebar.data.field)">Удалить</button>
+                   </ng-template>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</p-sidebar>

@@ -18,6 +18,7 @@ import { ListboxModule } from 'primeng/listbox';
 import { MenuModule } from 'primeng/menu';
 import { MenubarModule } from 'primeng/menubar';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { OrderListModule } from 'primeng/orderlist';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { PickListModule } from 'primeng/picklist';
 import { RadioButtonModule } from 'primeng/radiobutton';
@@ -70,7 +71,8 @@ import { CalendarComponent } from './component/formElements/calendar/calendar.co
 import { MoreLessViewComponent } from './component/viewElements/more-less-view/more-less-view.component';
 import { GeoBilletComponent } from './component/viewElements/ya-map-view/geo-billet/geo-billet.component';
 import { OverlayPanelComponent } from './component/formElements/overlay-panel/overlay-panel.component';
-import { SimpleBilletComponent } from './component/viewElements/simple-billet/simple-billet.component'
+import { SimpleBilletComponent } from './component/viewElements/simple-billet/simple-billet.component';
+import { FieldCustomizerViewComponent } from './component/viewElements/field-customizer-view/field-customizer-view.component'
 
 const maskConfigFunction: () => Partial<IConfig> = () => {
     return {
@@ -93,7 +95,8 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
         MoreLessViewComponent,
         GeoBilletComponent,
         OverlayPanelComponent,
-        SimpleBilletComponent],
+        SimpleBilletComponent,
+        FieldCustomizerViewComponent],
     imports: [
         CommonModule,
         CoreRoutingModule,
@@ -122,12 +125,15 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
         SidebarModule,
         ListboxModule,
         OverlayPanelModule,
+        OrderListModule,
         DynamicDialogModule,
         RadioButtonModule,
         PickListModule,
         TieredMenuModule,
         TooltipModule,
-        AngularYandexMapsModule
+        AngularYandexMapsModule,
+        CommonModule,
+        CommonModule
     ]
 })
 export class CoreModule { }

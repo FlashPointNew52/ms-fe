@@ -64,16 +64,7 @@ export class DealViewComponent implements OnInit {
     // }
     @ViewChild(YaMapViewComponent) mapComponent: YaMapViewComponent | undefined;
     // @ViewChildren(InputTextarea) textarea: InputTextarea | undefined;
-    sidebar = {
-        visible: false,
-        page: 0,
-        data: {} as any,
 
-        openPage: function(page: number, data: any){
-            this.page = page;
-            this.data = data
-        }
-    };
     fullscreen = false;
     mapChips: any[] = [];
     dealClass = Deal;

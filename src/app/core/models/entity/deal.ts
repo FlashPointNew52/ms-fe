@@ -516,64 +516,65 @@ export class Deal {
     ];
 
     public static arraysDescription = {
-        "livingRooms" : {
-            label: "Жилые помещения", multiply: true, array: [
-                {label: 'Столовая', code: 'dining'},
-                {label: 'Гостиная', code: 'living'},
-                {label: 'Спальня', code: 'bedroom'},
-            ]
-        },
-        "auxiliaryRooms": { label: "Вспомогательные помещения", multiply: true, array: [
-                {label: 'Кухня', code: 'kitchen'},
-                {label: 'Кухня-ниша', code: 'mini-kitchen'},
-                {label: 'Кухня-столовая', code: 'kitchen-dining'},
-                {label: 'Кухня-гостиная', code: 'living-kitchen'},
-                {label: 'Коридор', code: 'corridor'},
-                {label: 'Холл', code: 'hall'},
-                {label: 'Внутренний тамбур', code: 'vestibule'},
-                {label: 'Передняя (прихожая)', code: 'hallway'},
-                {label: 'Ванная комната', code: 'bathroom'},
-                {label: 'Душевая комната', code: 'shower-room'},
-                {label: 'Туалетная комната', code: 'toilet'},
-                {label: 'Уборная', code: 'wc'},
-                {label: 'Совмещеннй санузел', code: 'wc1'},
-                {label: 'Кладовая', code: 'pantry'},
-                {label: 'Кабинет', code: 'cabinet'},
-                {label: 'Гардеробная', code: 'wardrobe'},
-                {label: 'Постирочная', code: 'laundry'},
-                {label: 'Встроенный шкаф', code: 'build-in-wardrobe'},
-                {label: 'Библиотека', code: 'library'}
-            ]
-        },
-        "extraRooms" : {
-            label: "Встроенные и примыкающие пом.", multiply: true, array: [
-                {label: 'Балкон', code: 'balcony'},
-                {label: 'Лоджия', code: 'loggia'},
-                {label: 'Веранда', code: 'veranda'},
-                {label: 'Терраса', code: 'terrace'},
-                {label: 'Эксплуатируемая кровля', code: 'roof'},
-                {label: 'Эркер', code: 'oriel'}
-            ]
-        },
-        "generalDescription" : {
-            label: "Общее описание", multiply: false, array: [
-                {label: 'Планировочное решение', code: 'balcony', description: 'Раздельные комнаты, Смежные комнаты, Студия, Стандартная, Свободная, Перепланированная ...'},
-                {label: 'Высота потолка', code: 'loggia'},
-                {label: 'Окна', code: 'window', description: 'Стандартные, Панорамные, Витражные, Витринные ...'},
-                {label: 'Отделка помещений', code: 'interior', description: 'Черновая отделка, Предчистовая отделка, Чистовая отделка\n' +
-                        'Отделка «Под ключ», Дизайнерский проект, Требуется косметический ремонт, Требуется капитальный ремонт ...'}
-            ]
-        },
-
-        "engineering" : {
-            label: "Инженерия", multiply: false, array: [
-                {label: 'Электроснабжение', code: 'electricity'},
-                {label: 'Газоснабжение', code: 'gas'},
-                {label: 'Водоснабжение', code: 'water'},
-                {label: 'Канализация', code: 'sewerage'},
-                {label: 'Вентиляция', code: 'ventilation'},
-                {label: 'Кондиционирование / климат', code: 'conditioning'}
-            ]
-        },
+        main: { label: "Общая", sections: {}},
+        object: { label: "Объект", sections: {
+            "livingRooms" : {
+                label: "Жилые помещения", multiply: true, array: [
+                    {label: 'Столовая', code: 'dining'},
+                    {label: 'Гостиная', code: 'living'},
+                    {label: 'Спальня', code: 'bedroom'},
+                ]},
+            "auxiliaryRooms": { label: "Вспомогательные помещения", multiply: true, array: [
+                    {label: 'Кухня', code: 'kitchen'},
+                    {label: 'Кухня-ниша', code: 'mini-kitchen'},
+                    {label: 'Кухня-столовая', code: 'kitchen-dining'},
+                    {label: 'Кухня-гостиная', code: 'living-kitchen'},
+                    {label: 'Коридор', code: 'corridor'},
+                    {label: 'Холл', code: 'hall'},
+                    {label: 'Внутренний тамбур', code: 'vestibule'},
+                    {label: 'Передняя (прихожая)', code: 'hallway'},
+                    {label: 'Ванная комната', code: 'bathroom'},
+                    {label: 'Душевая комната', code: 'shower-room'},
+                    {label: 'Туалетная комната', code: 'toilet'},
+                    {label: 'Уборная', code: 'wc'},
+                    {label: 'Совмещеннй санузел', code: 'wc1'},
+                    {label: 'Кладовая', code: 'pantry'},
+                    {label: 'Кабинет', code: 'cabinet'},
+                    {label: 'Гардеробная', code: 'wardrobe'},
+                    {label: 'Постирочная', code: 'laundry'},
+                    {label: 'Встроенный шкаф', code: 'build-in-wardrobe'},
+                    {label: 'Библиотека', code: 'library'}
+                ]},
+            "extraRooms" : {
+                label: "Встроенные и примыкающие пом.", multiply: true, array: [
+                    {label: 'Балкон', code: 'balcony'},
+                    {label: 'Лоджия', code: 'loggia'},
+                    {label: 'Веранда', code: 'veranda'},
+                    {label: 'Терраса', code: 'terrace'},
+                    {label: 'Эксплуатируемая кровля', code: 'roof'},
+                    {label: 'Эркер', code: 'oriel'}
+                ]
+            },
+            "generalDescription" : {
+                label: "Общее описание", multiply: false, array: [
+                    {label: 'Планировочное решение', code: 'balcony', description: 'Раздельные комнаты, Смежные комнаты, Студия, Стандартная, Свободная, Перепланированная ...'},
+                    {label: 'Высота потолка', code: 'loggia'},
+                    {label: 'Окна', code: 'window', description: 'Стандартные, Панорамные, Витражные, Витринные ...'},
+                    {label: 'Отделка помещений', code: 'interior', description: 'Черновая отделка, Предчистовая отделка, Чистовая отделка\n' +
+                            'Отделка «Под ключ», Дизайнерский проект, Требуется косметический ремонт, Требуется капитальный ремонт ...'}
+                ]
+            },
+            "engineering" : {
+                label: "Инженерия", multiply: false, array: [
+                    {label: 'Электроснабжение', code: 'electricity'},
+                    {label: 'Газоснабжение', code: 'gas'},
+                    {label: 'Водоснабжение', code: 'water'},
+                    {label: 'Канализация', code: 'sewerage'},
+                    {label: 'Вентиляция', code: 'ventilation'},
+                    {label: 'Кондиционирование / климат', code: 'conditioning'}
+                ]
+            },
+            }},
+        geolocation: { label: "Геолокация", sections: {}},
     }
 }

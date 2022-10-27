@@ -17,7 +17,6 @@ $color-blue-dark: #003153;
 
 //$color-black-ever-lighter: #72727d;
 //$color-black-ever-lighter: #52525d;
-//$color-black-ever-lighter: #3F586B;
 $color-black-ever-lighter: #6f767b;
 $color-black-ever-lighter1: #3b5264;
 //$color-black-ever-lighter: #4B6C86;
@@ -109,7 +108,7 @@ $shadow: 0 5px 10px 0px rgba($color-black, 0.25);
 @mixin times{
     position: absolute;
     top: calc(50% - 7px);
-    right: 6px;
+    right: 10px;
     display: none;
     cursor: pointer;
     margin: 0;

@@ -93,7 +93,7 @@ export class SessionService extends ImplService{
         //     this.handle_errors(err);
         // });
         // return ret_subj;
-        return this.http.post(endpointUrl, dataStr, {headers: this.getHeaders()});
+        return this.http.post(endpointUrl, dataStr, {headers: this.getHeaders(), withCredentials: true});
     }
 
     private setSession(authResult: any): void {

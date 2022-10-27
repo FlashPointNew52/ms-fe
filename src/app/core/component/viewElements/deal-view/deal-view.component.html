@@ -21,29 +21,7 @@
     <ng-container *ngTemplateOutlet="face; context: {$implicit: false} "></ng-container>
     <ng-container *ngTemplateOutlet="face; context: {$implicit: true}"></ng-container>
     <p-tieredMenu #menu [popup]="true" appendTo="body" [model]="contextMenu" [styleClass]="tieredClass"></p-tieredMenu>
-    <p-sidebar [(visible)]="sidebar.visible" position="left" [modal]=false [baseZIndex]="8500" styleClass="tab-sidebar">
-        <div class="sidebar-header">
-
-        </div>
-        <div class="sidebar-body">
-            <ng-container *ngIf="sidebar.page == 0; else more">
-                <div *ngFor="let param of dealClass.arraysDescription | keyvalue: utils.originalOrder">
-                    <div><b>{{param.value.label}}</b></div>
-                    <div *ngFor="let option of param.value.array"
-                         (click)="sidebar.openPage(1, option) "
-                    >{{option.label}}</div>
-                </div>
-            </ng-container>
-            <ng-template #more>
-                <button (click)="sidebar.openPage(0, {})">Назад</button>
-                <label>{{sidebar.data.label}}</label>
-                <textarea #textAreaElement></textarea>
-                <button (click)="tempArray.push({label: sidebar.data.label, value: textAreaElement.value});
-                                  sidebar.visible = false; sidebar.openPage(0, {})"
-                >Добавить поле</button>
-            </ng-template>
-        </div>
-    </p-sidebar>
+    <app-field-customizer-view #customizer [fields]="dealClass.arraysDescription"></app-field-customizer-view>
     <form class="main_data" [formGroup]="form" >
         <p-tabView styleClass="tabView">
             <p-tabPanel header="Сделка">
@@ -120,11 +98,11 @@
                 </ng-container>
             </p-tabPanel>
             <p-tabPanel header="Объект">
-                <div (click)="sidebar.visible = true">Добавить</div>
-                <div *ngFor="let param of tempArray">
-                    <label>{{param.label}}</label>
-                    <div>{{param.value}}</div>
-                </div>
+                <div (click)="customizer.show()">Добавить</div>
+<!--                <div *ngFor="let param of tempArray">-->
+<!--                    <label>{{param.label}}</label>-->
+<!--                    <div>{{param.value}}</div>-->
+<!--                </div>-->
 <!--                <app-overlay-panel *ngFor="let param of dealClass.arraysDescription | keyvalue: utils.originalOrder "-->
 <!--                                   [multiply]="param.value.multiply"-->
 <!--                                   [label]="param.value.label"-->

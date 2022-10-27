@@ -184,8 +184,8 @@
                 transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
 
                 &.p-highlight {
-                    border-color: #3F586B;
-                    background:  #3F586B;
+                    border-color: $color-black;
+                    background: $color-black;
                 }
 
                 .p-radiobutton-icon {
@@ -402,10 +402,14 @@
         box-shadow: $shadow;
         color: $color-black;
         border-radius: 6px 0 0 6px;
-
+        overflow: hidden;
 
         &.p-sidebar-left{
-            left: 30px;
+            border-radius: 0 6px 6px 0;
+
+            &.big{
+                width: 740px !important;
+            }
         }
 
         &.extended{
@@ -445,6 +449,7 @@
 
             }
         }
+
         .sidebar-header{
             background: $color-tab;
             height: 70px;
@@ -459,6 +464,7 @@
                 padding-left: 20px;
             }
         }
+
         .p-sidebar-content{
             padding: 0;
             overflow-y: hidden;
