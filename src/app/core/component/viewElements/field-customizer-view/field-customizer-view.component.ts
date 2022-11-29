@@ -1,46 +1,88 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    Input,
+    OnChanges,
+    OnInit,
+    SimpleChanges
+} from '@angular/core';
 import { Utils } from '../../../models/utils';
-
-
-export interface Field {
-    [key: string]: {
-        label: string,
-        sections: {
-            [key: string]: any
-        }
-    }
-}
+import {
+    Field,
+    FieldConfig,
+    FieldCustomizerService,
+    FieldType,
+    Section,
+    Sections
+} from '../../../services/field-customizer.service';
 
 export interface SelectedField {
     [key: string]: {
-        [key: string]: any[]
+        [key: string]: Map<Field, FieldConfig>
     }
+}
+
+export interface Sidebar {
+    visible: boolean;
+    page: number;
+    section: keyof Sections;
+    group?: keyof Section["groups"];
+    field?: Field;
+    alreadyAdd: boolean;
 }
 
 @Component({
     selector: 'app-field-customizer-view',
+    changeDetection: ChangeDetectionStrategy.OnPush,
     templateUrl: './field-customizer-view.component.html',
     styleUrls: ['./field-customizer-view.component.scss']
 })
 export class FieldCustomizerViewComponent implements OnInit, OnChanges {
-    @Input() fields: Field = {};
-    currentChapter: any;
+    @Input() sections: Sections;
+    @Input() header: string = '';
     selected: SelectedField = {};
     utils = Utils;
-    radio: any = "1";
+    selectedConfig?: FieldConfig;
+    FieldType = FieldType;
 
-    sidebar = {
-        visible: false,
+    sidebar: Sidebar = {
+        field: undefined,
         page: 0,
-        data: {} as any,
-
-        openPage: function(page: number, data: any){
-            this.page = page;
-            this.data = data
-        }
+        section: "MAIN",
+        group: undefined,
+        visible: false,
+        alreadyAdd: false
     };
 
-    constructor() { }
+    toMainPage(){
+        this.sidebar.page = 0;
+    }
+
+    toSecondPage(section: keyof Sections, group: keyof Section["groups"], field: Field){
+        this.sidebar.section = section;
+        this.sidebar.group = group;
+        this.sidebar.field = field;
+        // if(field.config.length < 2){
+        //     this.addField();
+        //     return;
+        // }
+        this.sidebar.page = 1;
+        this.sidebar.alreadyAdd = this.alreadyAdd(group, field);
+
+        let config = this.selected[section][group].get(field);
+        if(config){
+            this.selectedConfig = config;
+        } else
+            this.selectedConfig = field.config[0];
+        this.cd.detectChanges();
+    }
+
+    constructor(private fieldCustomizerService: FieldCustomizerService,
+                private cd: ChangeDetectorRef) {
+        this.sections = fieldCustomizerService.getAllFields();
+        this.recalcSelected();
+    }
 
     ngOnInit(): void {}
 
@@ -51,30 +93,36 @@ export class FieldCustomizerViewComponent implements OnInit, OnChanges {
     }
 
     public show(){
+        this.toMainPage();
         this.sidebar.visible = true;
+        this.cd.markForCheck();
     }
 
     recalcSelected(){
-        for(let data in this.fields){
+        for(let sectionKey of Object.keys(this.sections)){
             let section: any = {};
-            for(let sec in this.fields[data].sections)
-                section[sec] = [];
-            this.selected[data] = section;
+            for(let groupKey of Object.keys(this.sections[sectionKey].groups))
+                section[groupKey] = new Map<Field, FieldConfig>();
+            this.selected[sectionKey] = section;
         }
     }
 
     addField() {
-        // if(!this.selected[this.currentChapter])
-        this.selected[this.currentChapter][this.sidebar.data.section].push(this.sidebar.data.field);
-        // selected.push({label: sidebar.data.label, value: textAreaElement.value});
-        this.sidebar.openPage(0, {})
+        this.selected[this.sidebar.section!][this.sidebar.group!].set(this.sidebar.field!, this.selectedConfig!)
+        this.toMainPage();
+
     }
 
-    remove(section: any, field: any) {
-        const array = this.selected[this.currentChapter][section]
-        const i = array.indexOf(field);
-        if(i >= 0)
-            array.splice(i, 1);
-        this.sidebar.openPage(0, {})
+    remove(group: any, field: any) {
+        this.selected[this.sidebar.section!][group].delete(field);
+        this.toMainPage();
+    }
+
+    getValue(value: Map<Field, FieldConfig>) {
+        return Array.from(value.keys());
+    }
+
+    alreadyAdd(group: any, field: Field): boolean {
+        return this.selected[this.sidebar.section!][group].has(field);
     }
 }

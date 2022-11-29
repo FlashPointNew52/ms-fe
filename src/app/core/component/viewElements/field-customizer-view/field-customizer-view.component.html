@@ -3,66 +3,96 @@
     <div class="sidebar-header">НАСТРОЙКА ПОЛЕЙ</div>
     <div class="sidebar-body field-customizer">
         <div class="tabs">
-            <div class="subheader">ПРОДАЖА - 2 КОМНАТНОЙ КВАРТИРЫ, ПО УЛ. ПАВЛА ЛЕОНТЬЕВИЧА МОРО... 
-            </div>
-            <div *ngFor="let param of fields | keyvalue: utils.originalOrder" class="tab">
-                <p-radioButton [value]="param.key" [(ngModel)]="currentChapter" [label]="param.value.label"
+            <div class="subheader">{{header}}</div>
+            <div *ngFor="let section of sections | keyvalue: utils.originalOrder" class="tab">
+                <p-radioButton [value]="section.key" [(ngModel)]="sidebar.section" [label]="section.value.label"
                                labelStyleClass="before-radio"
                 ></p-radioButton>
             </div>
         </div>
         <div class="side left">
-            <div class="section-container"
-                 *ngFor="let section of fields[currentChapter]?.sections | keyvalue: utils.originalOrder"
+            <div class="group-container"
+                 *ngFor="let group of sections[sidebar.section!]?.groups | keyvalue: utils.originalOrder"
             >
-                <div class="section-name">{{section.value?.label}}</div>
-                <div *ngFor="let option of section.value?.array" class="column-name"
-                     (click)="sidebar.openPage(1, {field: option, section: section.key, new: true}) "
-                >{{option.label}}</div>
+                <div class="group-name">{{group.value?.label}}</div>
+                <div *ngFor="let subgroup of group.value?.subgroups | keyvalue: utils.originalOrder">
+                    <div class="subgroup-name">{{subgroup.value.label}}</div>
+                    <ng-container *ngTemplateOutlet="fields; context: {$implicit: {array: subgroup.value?.fields, group: group.key}}"></ng-container>
+                </div>
+                <ng-container *ngTemplateOutlet="fields; context: {$implicit: {array: group.value?.fields, group: group.key}}"></ng-container>
+
+                <ng-template #fields let-data>
+                    <div *ngFor="let field of data.array" class="column-name"
+                         (click)="toSecondPage(sidebar.section, data.group!, field) "
+                    >{{field.label}}</div>
+                </ng-template>
             </div>
         </div>
         <div class="side right">
             <ng-container *ngIf="sidebar.page == 0; else more">
                 <div class="description">Эти поля появятся при просмотре информации о сделке. Вы можете изменить их
                     последовательность перетащив нужное</div>
-                <ng-container *ngFor="let section of selected[currentChapter] | keyvalue: utils.originalOrder">
-                    <p-orderList *ngIf="section.value.length > 0"
-                            [header]="fields[currentChapter].sections[section.key].label"
-                            [value]="section.value" [dragdrop]="true" class="selected-fields"
+                <ng-container *ngFor="let group of selected[sidebar.section!] | keyvalue: utils.originalOrder">
+                    <p-orderList *ngIf="group.value.size > 0"
+                            [header]="sections[sidebar.section!].groups[group.key!].label"
+                            [value]="getValue(group.value)" [dragdrop]="true" class="selected-fields"
                     >
                         <ng-template let-field pTemplate="item">
-                            <div class="selected-field">{{field.label}}
-                                <span >
-                                    <i class="pi pi-cog" (click)="sidebar.openPage(1, {field: field, section: section.key, new: false })"></i>
-                                    <i class="pi pi-times" (click)="remove(section.key, field)"></i>
+                            <div class="selected-field">
+                                {{field.label}}
+                                <span>
+                                    <i class="pi pi-cog" (click)="toSecondPage(sidebar.section, group.key, field)"></i>
+                                    <i class="pi pi-times" (click)="remove(group.key, field)"></i>
                                 </span>
                             </div>
                         </ng-template>
                     </p-orderList>
                 </ng-container>
-
-
             </ng-container>
             <ng-template #more>
                 <div class="field-configurator">
-                    <button (click)="sidebar.openPage(0, {})" class="back">
+                    <button (click)="toMainPage()" class="back">
                         <i class="pi pi-chevron-left"></i>Назад
                     </button>
-                    <label>{{sidebar.data.field.label}}</label>
+                    <label>{{sidebar.field!.label}}</label>
                     <hr>
-                    <p-radioButton label="Стандартно" [value]="1" [(ngModel)]="radio"></p-radioButton>
-                    <p-radioButton label="Текстовое поле" [value]="2" [(ngModel)]="radio"></p-radioButton>
-                    <p-radioButton label="Числовое поле" [value]="3" [(ngModel)]="radio"></p-radioButton>
-                    <p-radioButton label="Числовой промежуток" [value]="4" [(ngModel)]="radio"></p-radioButton>
-                    <p-radioButton label="Календарь с одной датой" [value]="5" [(ngModel)]="radio"></p-radioButton>
-                    <p-radioButton label="Временной промежуток" [value]="6" [(ngModel)]="radio"></p-radioButton>
-                    <p-radioButton label="Комментарий" [value]="7" [(ngModel)]="radio"></p-radioButton>
-                    <ng-container *ngIf="sidebar.data.new; else panel">
+                    <ng-container *ngFor="let config of sidebar.field!.config">
+                        <p-radioButton [label]="config.label" [value]="config" [(ngModel)]="selectedConfig">
+                        </p-radioButton>
+                        <div [ngSwitch]="config.type" *ngIf="selectedConfig == config">
+                            <app-dropdown *ngSwitchCase="FieldType.CHOICE"
+                                          [options]="config | field: 'options'"
+                            ></app-dropdown>
+                            <app-dropdown *ngSwitchCase="FieldType.DEPENDED_CHOICE"
+                                          [options]="config | field: 'options'"
+                            ></app-dropdown>
+                            <app-dropdown-tag *ngSwitchCase="FieldType.TAGS"></app-dropdown-tag>
+                            <textarea *ngSwitchCase="FieldType.TEXTAREA" [placeholder]="config | field: 'placeholder'"
+                                      rows="1" cols="30" pInputTextarea [autoResize]="true" [disabled]="true"
+                            ></textarea>
+                            <app-calendar *ngSwitchCase="FieldType.DATE"
+                                          [placeholder]="config | field: 'placeholder'"
+                            ></app-calendar>
+                            <ng-container *ngSwitchCase="FieldType.RANGE">
+                                <app-simple-input [placeholder]="config | field: 'placeholder'"
+                                                  [disabled]="true"
+                                ></app-simple-input>
+                                <app-simple-input [placeholder]="config | field: 'placeholder'"
+                                                  [disabled]="true"
+                                ></app-simple-input>
+                            </ng-container>
+                            <app-simple-input *ngSwitchDefault
+                                              [placeholder]="config | field: 'placeholder'"
+                                              [disabled]="true"
+                            ></app-simple-input>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="!sidebar.alreadyAdd; else panel">
                         <button (click)="addField()">Добавить</button>
                     </ng-container>
                    <ng-template #panel>
-                       <button>Изменить</button>
-                       <button (click)="remove(sidebar.data.section, sidebar.data.field)">Удалить</button>
+                       <button (click)="addField()">Изменить</button>
+                       <button (click)="remove(sidebar.group, sidebar.field)">Удалить</button>
                    </ng-template>
                 </div>
             </ng-template>

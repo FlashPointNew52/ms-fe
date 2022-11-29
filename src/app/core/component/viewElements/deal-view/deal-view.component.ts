@@ -464,4 +464,7 @@ export class DealViewComponent implements OnInit {
         array.splice(array.indexOf(data), 1);
     }
 
+    getCustomizerHeader() {
+        return this.dealClass.objectTypeOptions[this.form.get('objectType')?.value as keyof typeof Deal.objectTypeOptions].label;
+    }
 }

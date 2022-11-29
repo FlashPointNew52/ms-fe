@@ -1,10 +1,8 @@
 import {
     ChangeDetectionStrategy, ChangeDetectorRef,
-    Component,
-    EventEmitter, forwardRef,
-    Input, OnChanges,
+    Component, forwardRef,
+    Input,
     OnInit,
-    Output, SimpleChanges
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -21,10 +19,11 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 })
 export class DropdownComponent implements OnInit, ControlValueAccessor {
     @Input() options: Array<any> = [];
-    public value: any = '';
+    @Input() value: any = '';
     @Input() filter: boolean = false;
     @Input() usePrefix: boolean = false;
     @Input() placeholder: string = '';
+    @Input() scrollHeight: string = '315px';
     @Input() headerText: string | null = null;
     @Input() showClear: boolean = false;
     @Input() appendTo: any = null;

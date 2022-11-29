@@ -1,5 +1,5 @@
 <p-dropdown [options]="options" [(ngModel)]="value" [placeholder]="placeholder" [showClear]="showClear" [filter]="filter" #dropdown
-            scrollHeight="315px" optionLabel="label" [optionValue]="optionValue"
+            [scrollHeight]="scrollHeight" optionLabel="label" [optionValue]="optionValue"
             (onChange)="change($event)" [group]="group" [appendTo]="appendTo"
             [panelStyleClass]="'dropdown-panel' + (dropdown._filterValue && dropdown._filterValue.length > 0 ? ' withoutSearch' : '')"
 >

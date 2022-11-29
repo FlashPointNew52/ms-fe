@@ -21,7 +21,7 @@
     <ng-container *ngTemplateOutlet="face; context: {$implicit: false} "></ng-container>
     <ng-container *ngTemplateOutlet="face; context: {$implicit: true}"></ng-container>
     <p-tieredMenu #menu [popup]="true" appendTo="body" [model]="contextMenu" [styleClass]="tieredClass"></p-tieredMenu>
-    <app-field-customizer-view #customizer [fields]="dealClass.arraysDescription"></app-field-customizer-view>
+    <app-field-customizer-view #customizer [header]="getCustomizerHeader()"></app-field-customizer-view>
     <form class="main_data" [formGroup]="form" >
         <p-tabView styleClass="tabView">
             <p-tabPanel header="Сделка">
@@ -56,10 +56,6 @@
                 <label>Тип недвижимости</label>
                 <app-dropdown [options]="dealClass.propertyTypeArray"  formControlName="propertyType"
                               optionLabel="label" [showClear]="false" scrollHeight="300px"
-                ></app-dropdown>
-                <label>Объект сделки</label>
-                <app-dropdown [options]="getProperty(form.get('propertyType')?.value, 'propertyTypeOptions').objectTypes"
-                              formControlName="objectType"  scrollHeight="300px" [showClear]="false" optionLabel="label"
                 ></app-dropdown>
                 <label>Количество комнат</label>
                 <app-simple-input></app-simple-input>
@@ -98,6 +94,12 @@
                 </ng-container>
             </p-tabPanel>
             <p-tabPanel header="Объект">
+                <div class="sub-form">Общее описание</div>
+                <label>Объект сделки</label>
+                <app-dropdown [options]="dealClass.propertyTypes"
+                              formControlName="objectType"  scrollHeight="400px" [showClear]="false" optionLabel="label"
+                              [group]="true"
+                ></app-dropdown>
                 <div (click)="customizer.show()">Добавить</div>
 <!--                <div *ngFor="let param of tempArray">-->
 <!--                    <label>{{param.label}}</label>-->

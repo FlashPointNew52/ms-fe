@@ -92,8 +92,14 @@
         &.left{
             padding: 15px;
 
-            .section-name{
+            .group-name{
                 @extend %section-name;
+            }
+
+            .subgroup-name{
+                line-height: 35px;
+                padding: 0 15px;
+                font-weight: bold;
             }
 
             .column-name{

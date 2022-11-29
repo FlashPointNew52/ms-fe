@@ -23,7 +23,7 @@ export class SimpleInputComponent implements OnInit, ControlValueAccessor {
     @Input() placeholder: string = '';
     @Input() disabled: boolean = false;
 
-    @Input() value: any;
+    @Input() value: string = '';
     @Output() remove: EventEmitter<any> = new EventEmitter<any>();
     public onChange = (val: any) => { };
     public onTouched = (val: any) => { };

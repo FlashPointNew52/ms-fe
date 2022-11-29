@@ -72,7 +72,8 @@ import { MoreLessViewComponent } from './component/viewElements/more-less-view/m
 import { GeoBilletComponent } from './component/viewElements/ya-map-view/geo-billet/geo-billet.component';
 import { OverlayPanelComponent } from './component/formElements/overlay-panel/overlay-panel.component';
 import { SimpleBilletComponent } from './component/viewElements/simple-billet/simple-billet.component';
-import { FieldCustomizerViewComponent } from './component/viewElements/field-customizer-view/field-customizer-view.component'
+import { FieldCustomizerViewComponent } from './component/viewElements/field-customizer-view/field-customizer-view.component';
+import { FieldPipe } from './pipes/field.pipe'
 
 const maskConfigFunction: () => Partial<IConfig> = () => {
     return {
@@ -96,7 +97,8 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
         GeoBilletComponent,
         OverlayPanelComponent,
         SimpleBilletComponent,
-        FieldCustomizerViewComponent],
+        FieldCustomizerViewComponent,
+        FieldPipe],
     imports: [
         CommonModule,
         CoreRoutingModule,
@@ -132,7 +134,6 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
         TieredMenuModule,
         TooltipModule,
         AngularYandexMapsModule,
-        CommonModule,
         CommonModule
     ]
 })

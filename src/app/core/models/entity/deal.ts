@@ -106,7 +106,6 @@ export class Deal {
         BUCKET: {label: 'Корзина'}
     }
 
-
     public static typeOptions = {
         PURCHASE: { label: 'Покупка', stages: [
                 {
@@ -405,8 +404,40 @@ export class Deal {
         VEGETABLE_LAND: { label: 'Огородный земельный участок'},
         FIELD_LAND: { label: 'Полевой земельный участок'},
         HOMESTEAD_LAND: { label: 'Приусадебный земельный участок'},
-        INDUSTRIAL_SITE: { label: 'Участок промназначения'}
+        INDUSTRIAL_SITE: { label: 'Земельный участок промназначения'},
+        HOME_LAND: { label: 'Придомовой земельный участок'}
     };
+
+    public static propertyTypes = [
+        {label: 'Жилая недвижимость', value: "LIVING", items: [
+                {label: Deal.objectTypeOptions.ROOM.label, code: 'ROOM'},
+                {label: Deal.objectTypeOptions.FLAT.label, code: 'FLAT'},
+                {label: Deal.objectTypeOptions.GARDEN_HOUSE.label, code: 'GARDEN_HOUSE'},
+                {label: Deal.objectTypeOptions.HOUSE.label, code: 'HOUSE'},
+                {label: Deal.objectTypeOptions.PART_APARTMENT.label, code: 'PART_APARTMENT'},
+                {label: Deal.objectTypeOptions.PART_HOUSE.label, code: 'PART_HOUSE'}
+            ]},
+        {label: 'Коммерческая недвижимость',  value: "COMMERCIAL", items: [
+                {label: Deal.objectTypeOptions.APARTMENT.label, code: 'APARTMENT'},
+                {label: Deal.objectTypeOptions.PARKING_PLACE.label, code: 'PARKING_PLACE'},
+                {label: Deal.objectTypeOptions.OFFICE.label, code: 'OFFICE'},
+                {label: Deal.objectTypeOptions.STOREHOUSE.label, code: 'STOREHOUSE'},
+                {label: Deal.objectTypeOptions.STORAGE.label, code: 'STORAGE'},
+                {label: Deal.objectTypeOptions.RETAIL_SPACE.label, code: 'RETAIL_SPACE'},
+                {label: Deal.objectTypeOptions.FREE_SPACE.label, code: 'FREE_SPACE'},
+                {label: Deal.objectTypeOptions.PAVILION.label, code: 'PAVILION'},
+                {label: Deal.objectTypeOptions.WORK_PLACE.label, code: 'WORK_PLACE'},
+                {label: Deal.objectTypeOptions.GILD.label, code: 'GILD'}
+            ]},
+        {label: 'Земельный участок', value: "LAND", items: [
+                {label: Deal.objectTypeOptions.GARDEN_LAND.label, code: 'GARDEN_LAND'},
+                {label: Deal.objectTypeOptions.VEGETABLE_LAND.label, code: 'VEGETABLE_LAND'},
+                {label: Deal.objectTypeOptions.FIELD_LAND.label, code: 'FIELD_LAND'},
+                {label: Deal.objectTypeOptions.HOMESTEAD_LAND.label, code: 'HOMESTEAD_LAND'},
+                {label: Deal.objectTypeOptions.INDUSTRIAL_SITE.label, code: 'INDUSTRIAL_SITE'},
+                {label: Deal.objectTypeOptions.HOME_LAND.label, code: 'HOME_LAND'}
+            ]},
+    ];
 
     public static propertyTypeOptions = {
         LIVING: {label: 'Жилая недвижимость', objectTypes: [
@@ -514,67 +545,4 @@ export class Deal {
         {label: Deal.qualificationOptions.NOT, code: 'NOT'},
         {label: Deal.qualificationOptions.OTHER, code: 'OTHER'},
     ];
-
-    public static arraysDescription = {
-        main: { label: "Общая", sections: {}},
-        object: { label: "Объект", sections: {
-            "livingRooms" : {
-                label: "Жилые помещения", multiply: true, array: [
-                    {label: 'Столовая', code: 'dining'},
-                    {label: 'Гостиная', code: 'living'},
-                    {label: 'Спальня', code: 'bedroom'},
-                ]},
-            "auxiliaryRooms": { label: "Вспомогательные помещения", multiply: true, array: [
-                    {label: 'Кухня', code: 'kitchen'},
-                    {label: 'Кухня-ниша', code: 'mini-kitchen'},
-                    {label: 'Кухня-столовая', code: 'kitchen-dining'},
-                    {label: 'Кухня-гостиная', code: 'living-kitchen'},
-                    {label: 'Коридор', code: 'corridor'},
-                    {label: 'Холл', code: 'hall'},
-                    {label: 'Внутренний тамбур', code: 'vestibule'},
-                    {label: 'Передняя (прихожая)', code: 'hallway'},
-                    {label: 'Ванная комната', code: 'bathroom'},
-                    {label: 'Душевая комната', code: 'shower-room'},
-                    {label: 'Туалетная комната', code: 'toilet'},
-                    {label: 'Уборная', code: 'wc'},
-                    {label: 'Совмещеннй санузел', code: 'wc1'},
-                    {label: 'Кладовая', code: 'pantry'},
-                    {label: 'Кабинет', code: 'cabinet'},
-                    {label: 'Гардеробная', code: 'wardrobe'},
-                    {label: 'Постирочная', code: 'laundry'},
-                    {label: 'Встроенный шкаф', code: 'build-in-wardrobe'},
-                    {label: 'Библиотека', code: 'library'}
-                ]},
-            "extraRooms" : {
-                label: "Встроенные и примыкающие пом.", multiply: true, array: [
-                    {label: 'Балкон', code: 'balcony'},
-                    {label: 'Лоджия', code: 'loggia'},
-                    {label: 'Веранда', code: 'veranda'},
-                    {label: 'Терраса', code: 'terrace'},
-                    {label: 'Эксплуатируемая кровля', code: 'roof'},
-                    {label: 'Эркер', code: 'oriel'}
-                ]
-            },
-            "generalDescription" : {
-                label: "Общее описание", multiply: false, array: [
-                    {label: 'Планировочное решение', code: 'balcony', description: 'Раздельные комнаты, Смежные комнаты, Студия, Стандартная, Свободная, Перепланированная ...'},
-                    {label: 'Высота потолка', code: 'loggia'},
-                    {label: 'Окна', code: 'window', description: 'Стандартные, Панорамные, Витражные, Витринные ...'},
-                    {label: 'Отделка помещений', code: 'interior', description: 'Черновая отделка, Предчистовая отделка, Чистовая отделка\n' +
-                            'Отделка «Под ключ», Дизайнерский проект, Требуется косметический ремонт, Требуется капитальный ремонт ...'}
-                ]
-            },
-            "engineering" : {
-                label: "Инженерия", multiply: false, array: [
-                    {label: 'Электроснабжение', code: 'electricity'},
-                    {label: 'Газоснабжение', code: 'gas'},
-                    {label: 'Водоснабжение', code: 'water'},
-                    {label: 'Канализация', code: 'sewerage'},
-                    {label: 'Вентиляция', code: 'ventilation'},
-                    {label: 'Кондиционирование / климат', code: 'conditioning'}
-                ]
-            },
-            }},
-        geolocation: { label: "Геолокация", sections: {}},
-    }
 }
