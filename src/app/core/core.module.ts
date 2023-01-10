@@ -74,6 +74,10 @@ import { OverlayPanelComponent } from './component/formElements/overlay-panel/ov
 import { SimpleBilletComponent } from './component/viewElements/simple-billet/simple-billet.component';
 import { FieldCustomizerViewComponent } from './component/viewElements/field-customizer-view/field-customizer-view.component';
 import { FieldPipe } from './pipes/field.pipe'
+import { MultiselectSearchComponent } from "./component/formElements/multiselect-search/multiselect-search.component";
+import { DropdownFormComponent } from './component/formElements/dropdown-form/dropdown-form.component';
+import { InlineDropdownComponent } from './component/formElements/inline-dropdown/inline-dropdown.component';
+import { CallPipe } from './pipes/call.pipe';
 
 const maskConfigFunction: () => Partial<IConfig> = () => {
     return {
@@ -98,7 +102,11 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
         OverlayPanelComponent,
         SimpleBilletComponent,
         FieldCustomizerViewComponent,
-        FieldPipe],
+        FieldPipe,
+        MultiselectSearchComponent,
+        DropdownFormComponent,
+        InlineDropdownComponent,
+        CallPipe],
     imports: [
         CommonModule,
         CoreRoutingModule,

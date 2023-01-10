@@ -1,0 +1,17 @@
+<p-dropdown [options]="options"
+            [(ngModel)]="value"
+            (ngModelChange)="onChange($event)"
+            [placeholder]="placeholder"
+            [showClear]="false"
+            optionLabel="label"
+            [optionValue]="optionValue"
+            panelStyleClass="inline"
+>
+    <ng-template let-val pTemplate="selectedItem">
+        <div>{{val.label}} {{postfix}}</div>
+    </ng-template>
+    <ng-template let-item pTemplate="item">
+        <div class="ring-selector"><span>{{item.label}}</span></div>
+    </ng-template>
+</p-dropdown>
+

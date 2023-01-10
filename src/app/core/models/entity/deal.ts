@@ -1,5 +1,6 @@
 import { Confirmation, IStageCode } from '../../../models/entity/contact';
 import { AddressBlock } from '../address-block';
+import {strict} from "assert";
 
 export class Deal {
     id?: string;
@@ -546,3 +547,4 @@ export class Deal {
         {label: Deal.qualificationOptions.OTHER, code: 'OTHER'},
     ];
 }
+

@@ -1,10 +1,10 @@
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
-    Component,
+    Component, EventEmitter,
     Input,
     OnChanges,
-    OnInit,
+    OnInit, Output,
     SimpleChanges
 } from '@angular/core';
 import { Utils } from '../../../models/utils';
@@ -19,13 +19,12 @@ import {
 
 export interface SelectedField {
     [key: string]: {
-        [key: string]: Map<Field, FieldConfig>
+        [key: string]: Field[]
     }
 }
 
 export interface Sidebar {
     visible: boolean;
-    page: number;
     section: keyof Sections;
     group?: keyof Section["groups"];
     field?: Field;
@@ -41,41 +40,36 @@ export interface Sidebar {
 export class FieldCustomizerViewComponent implements OnInit, OnChanges {
     @Input() sections: Sections;
     @Input() header: string = '';
-    selected: SelectedField = {};
+    @Input() selected: SelectedField = {};
+    @Output() selectedChange: EventEmitter<SelectedField> = new EventEmitter<SelectedField>();
+
     utils = Utils;
-    selectedConfig?: FieldConfig;
     FieldType = FieldType;
 
     sidebar: Sidebar = {
         field: undefined,
-        page: 0,
         section: "MAIN",
         group: undefined,
         visible: false,
         alreadyAdd: false
     };
 
-    toMainPage(){
-        this.sidebar.page = 0;
-    }
-
     toSecondPage(section: keyof Sections, group: keyof Section["groups"], field: Field){
         this.sidebar.section = section;
         this.sidebar.group = group;
         this.sidebar.field = field;
-        // if(field.config.length < 2){
-        //     this.addField();
-        //     return;
-        // }
-        this.sidebar.page = 1;
-        this.sidebar.alreadyAdd = this.alreadyAdd(group, field);
+        this.addField();
+        return;
 
-        let config = this.selected[section][group].get(field);
-        if(config){
-            this.selectedConfig = config;
-        } else
-            this.selectedConfig = field.config[0];
-        this.cd.detectChanges();
+        // this.sidebar.page = 1;
+        // this.sidebar.alreadyAdd = this.alreadyAdd(group, field);
+        //
+        // let config = this.selected[section][group].get(field);
+        // if(config){
+        //     this.selectedConfig = config;
+        // } else
+        //     this.selectedConfig = field.config[0];
+        // this.cd.detectChanges();
     }
 
     constructor(private fieldCustomizerService: FieldCustomizerService,
@@ -93,7 +87,6 @@ export class FieldCustomizerViewComponent implements OnInit, OnChanges {
     }
 
     public show(){
-        this.toMainPage();
         this.sidebar.visible = true;
         this.cd.markForCheck();
     }
@@ -102,27 +95,23 @@ export class FieldCustomizerViewComponent implements OnInit, OnChanges {
         for(let sectionKey of Object.keys(this.sections)){
             let section: any = {};
             for(let groupKey of Object.keys(this.sections[sectionKey].groups))
-                section[groupKey] = new Map<Field, FieldConfig>();
+                section[groupKey] = [];
             this.selected[sectionKey] = section;
         }
     }
 
     addField() {
-        this.selected[this.sidebar.section!][this.sidebar.group!].set(this.sidebar.field!, this.selectedConfig!)
-        this.toMainPage();
-
+        this.selected[this.sidebar.section!][this.sidebar.group!] = [...this.selected[this.sidebar.section!][this.sidebar.group!], this.sidebar.field!];
+        this.cd.detectChanges();
     }
 
     remove(group: any, field: any) {
-        this.selected[this.sidebar.section!][group].delete(field);
-        this.toMainPage();
+        let index =this.selected[this.sidebar.section!][group].indexOf(field);
+        this.selected[this.sidebar.section!][group].splice(index, 1);
     }
 
-    getValue(value: Map<Field, FieldConfig>) {
-        return Array.from(value.keys());
-    }
-
-    alreadyAdd(group: any, field: Field): boolean {
-        return this.selected[this.sidebar.section!][group].has(field);
+    update() {
+        this.selectedChange.emit(this.selected);
+        this.sidebar.visible = false;
     }
 }

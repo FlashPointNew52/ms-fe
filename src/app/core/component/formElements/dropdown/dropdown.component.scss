@@ -30,6 +30,7 @@
         .p-dropdown-panel{
             left: -1px !important;
             min-width: 170px;
+            border-radius: 5px;
         }
 
         .p-dropdown-clear-icon{
@@ -103,14 +104,18 @@
                 line-height: 19px;
                 display: inline-flex;
                 align-items: center;
-                width: 100%;
+                width: calc(100% - 20px);
+                margin: 0 8px;
+                border-radius: 5px;
 
                 &:not(.p-highlight):not(.p-disabled):hover, &.p-highlight:hover{
                     background: $color-blue-light;
                     color: $color-black;
 
                     ::ng-deep p-radiobutton .p-radiobutton .p-radiobutton-box{
-                        border-color: $color-black-ever-lighter1;
+                        border-color: transparent;
+                        background-color: transparent;
+                        transition: none;
                     }
                 }
 

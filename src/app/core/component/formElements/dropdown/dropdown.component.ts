@@ -30,6 +30,7 @@ export class DropdownComponent implements OnInit, ControlValueAccessor {
     @Input() group: boolean = false;
     @Input() optionValue: string = 'code';
     @Input() onlyDropdown: boolean = false;
+    @Input() editable: boolean = false;
 
     public onChange = (val: any) => { };
     public onTouched = (val: any) => { };

@@ -8,20 +8,21 @@ import {
     Output,
     ViewChild,
 } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-import { MenuItem } from 'primeng/api';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { pairwise, startWith } from 'rxjs/operators';
-import { ModalWindowComponent } from '../../../../modal-window/modal-window.component';
-import { AddressBlock } from '../../../models/address-block';
-import { Company } from '../../../models/entity/company';
-import { Deal } from '../../../models/entity/deal';
-import { Person } from '../../../models/entity/person';
-import { Utils } from '../../../models/utils';
-import { AddressPipe } from '../../../pipes/address.pipe';
-import { MapService } from '../../../services/map.service';
-import { AddressInputComponent } from '../../formElements/address-input/address-input.component';
-import { GeoData, YaMapViewComponent } from '../ya-map-view/ya-map-view.component';
+import {FormControl, FormGroup} from '@angular/forms';
+import {MenuItem} from 'primeng/api';
+import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
+import {pairwise, startWith} from 'rxjs/operators';
+import {ModalWindowComponent} from '../../../../modal-window/modal-window.component';
+import {AddressBlock} from '../../../models/address-block';
+import {Company} from '../../../models/entity/company';
+import {Deal} from '../../../models/entity/deal';
+import {Utils} from '../../../models/utils';
+import {AddressPipe} from '../../../pipes/address.pipe';
+import {MapService} from '../../../services/map.service';
+import {AddressInputComponent} from '../../formElements/address-input/address-input.component';
+import {GeoData, YaMapViewComponent} from '../ya-map-view/ya-map-view.component';
+import {SelectedField} from "../field-customizer-view/field-customizer-view.component";
+import {FieldCustomizerService, FieldType} from "../../../services/field-customizer.service";
 
 @Component({
     selector: 'app-deal-view',
@@ -53,18 +54,10 @@ export class DealViewComponent implements OnInit {
     @Output() entityChanges: EventEmitter<any> = new EventEmitter<any>();
     @Output() deleteChanges: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(AddressInputComponent) addressForm: AddressInputComponent | undefined;
-    // @ViewChild(AddressInputComponent) set content(content: AddressInputComponent) {
-    //     if (content) { // initially setter gets called with undefined
-    //         this.addressForm = content;
-    //         if(!(this.form.get('type')?.value === 'PURCHASE' || this.form.get('type')?.value === 'RENT')){
-    //             // this.changeDetectorRef.detectChanges();
-    //             this.form.addControl('addressBlock', (this.addressForm as AddressInputComponent).createGroup(this._entity.addressBlock));
-    //         }
-    //     }
-    // }
     @ViewChild(YaMapViewComponent) mapComponent: YaMapViewComponent | undefined;
-    // @ViewChildren(InputTextarea) textarea: InputTextarea | undefined;
-
+    dealFields = FieldCustomizerService.DEAL_FIELDS;
+    FieldType = FieldType;
+    showedFields: SelectedField = {};
     fullscreen = false;
     mapChips: any[] = [];
     dealClass = Deal;
@@ -135,11 +128,16 @@ export class DealViewComponent implements OnInit {
     constructor(private dialogService: DialogService,
                 public mapService: MapService,
                 private changeDetectorRef: ChangeDetectorRef,
-                private addressPipe: AddressPipe) { }
+                private addressPipe: AddressPipe,
+                private fieldCustomizerService: FieldCustomizerService) {
+
+    }
 
     ngOnInit(): void {
         this.setHouseTypes();
         this.setStageGroupArray();
+        this.showedFields = this.fieldCustomizerService.getTemplate();
+        this.updateForm(this.showedFields);
     }
 
     ngAfterViewChecked(): void {
@@ -465,6 +463,26 @@ export class DealViewComponent implements OnInit {
     }
 
     getCustomizerHeader() {
-        return this.dealClass.objectTypeOptions[this.form.get('objectType')?.value as keyof typeof Deal.objectTypeOptions].label;
+        return "Добавьте недостающие поля";
+        // return this.dealClass.objectTypeOptions[this.form.get('objectType')?.value as keyof typeof Deal.objectTypeOptions].label;
+    }
+
+    updateForm(event: SelectedField) {
+        let newForm = new FormGroup({});
+        for(const sectionName in event){
+            for(const groupName in event[sectionName])
+                event[sectionName][groupName].forEach(field => {
+                    let defaultValue;
+                    switch (field.config[0].type) {
+                        case FieldType.CHOICE:
+                            defaultValue = field.config[0].group ? field.config[0].options[0].items[0].code : field.config[0].options[0]?.code;
+                            break;
+                        case FieldType.DEPENDED_CHOICE:
+                            defaultValue = (field.config[0].options[newForm.get(field.config[0].dependedField)?.value] || [])[0]?.code;
+                    }
+                    newForm.addControl(field.code, new FormControl(defaultValue));
+                })
+        }
+        this.form = newForm;
     }
 }

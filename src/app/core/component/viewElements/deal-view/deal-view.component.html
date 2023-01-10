@@ -3,7 +3,7 @@
         <div class="face" [class.mini]="!withDop">
             <i class="pi pi-ellipsis-v pointer-menu" #pointerMenu (click)="menu.toggle($event)">
             </i>
-            <div class="heading" [innerHTML]="form.get('heading')?.value.trim()"
+            <div class="heading" [innerHTML]="form.get('heading')?.value?.trim()"
             ></div>
             <ng-container *ngIf="withDop">
                 <div class="info">{{ form.get('type')?.value != 'RENT' &&
@@ -21,85 +21,127 @@
     <ng-container *ngTemplateOutlet="face; context: {$implicit: false} "></ng-container>
     <ng-container *ngTemplateOutlet="face; context: {$implicit: true}"></ng-container>
     <p-tieredMenu #menu [popup]="true" appendTo="body" [model]="contextMenu" [styleClass]="tieredClass"></p-tieredMenu>
-    <app-field-customizer-view #customizer [header]="getCustomizerHeader()"></app-field-customizer-view>
+    <app-field-customizer-view #customizer
+                               [header]="getCustomizerHeader()"
+                               [(selected)]="showedFields" (selectedChange)="updateForm($event)"
+    ></app-field-customizer-view>
     <form class="main_data" [formGroup]="form" >
         <p-tabView styleClass="tabView">
-            <p-tabPanel header="Сделка">
-                <div class="sub-form">Общая информация</div>
-                <label>Заголовок сделки</label>
-                <textarea rows="1" cols="30" pInputTextarea #textarea [autoResize]="true" formControlName="heading"
-                          placeholder="Введите описание сделки ..."
-                ></textarea>
-                <label>Создание сделки</label>
-                <div class="const-data green">{{_entity.addDate | mDate}}</div>
-                <label>Закрытие сделки</label>
-                <app-calendar formControlName="closeDate" placeholder="Выберите дату закрытия сделки ..."
-                              dateFormat="dddd, DD MMMM YYYY г."
-                ></app-calendar>
+            <ng-container *ngFor="let section of showedFields | keyvalue: utils.originalOrder ">
+                <p-tabPanel [header]="dealFields[section.key].label">
+                    <ng-container *ngFor="let group of section.value | keyvalue: utils.originalOrder">
+                        <ng-container *ngIf="group.value.length > 0">
+                            <div class="sub-form">{{dealFields[section.key].groups[group.key].label}}</div>
+                            <ng-container *ngFor="let field of group.value!">
+                                <label>{{field.label }}</label>
+                                <ng-container [ngSwitch]="field.config[0].type">
+                                    <app-dropdown *ngSwitchCase="FieldType.CHOICE"
+                                                  [group]="(field.config[0] | field: 'group') || false"
+                                                  [options]="field.config[0] | field: 'options'"
+                                                  [formControlName]="field.code"
+                                    ></app-dropdown>
+                                    <app-inline-dropdown  *ngSwitchCase="FieldType.INLINE_CHOICE"
+                                                          [options]="field.config[0] | field: 'options'"
+                                                          [postfix]="field.config[0] | field: 'postfix' | call: form.get(field.code)?.value"
+                                                          [formControlName]="field.code"
+                                    ></app-inline-dropdown>
+                                    <app-multiselect *ngSwitchCase="FieldType.MULTI_CHOICE"
+                                                     [formControlName]="field.code"
+                                                     [params]="field.config[0] | field: 'options'"
+                                    ></app-multiselect>
+                                    <app-dropdown *ngSwitchCase="FieldType.DEPENDED_CHOICE"
+                                                  [formControlName]="field.code"
+                                                  [options]="(field.config[0] | field: 'options')[form.get(field.config[0] | field: 'dependedField' || 'DEFAULT')!.value]"
+                                                  [group]="field.config[0] | field: 'group'"
+                                                  [editable]="field.config[0] | field: 'editable'"
+                                    ></app-dropdown>
+                                    <app-dropdown-tag *ngSwitchCase="FieldType.TAGS"
+                                                      [formControlName]="field.code"></app-dropdown-tag>
+                                    <textarea *ngSwitchCase="FieldType.TEXTAREA"
+                                              [placeholder]="field.config[0] | field: 'placeholder'"
+                                              rows="1" cols="30" pInputTextarea
+                                              [autoResize]="true"
+                                              [formControlName]="field.code"
+                                    ></textarea>
+                                    <app-calendar *ngSwitchCase="FieldType.DATE"
+                                                  [placeholder]="field.config[0] | field: 'placeholder'"
+                                                  [formControlName]="field.code"
+                                    ></app-calendar>
+                                    <ng-container *ngSwitchCase="FieldType.RANGE"></ng-container>
+                                    <app-simple-input *ngSwitchDefault
+                                                      [placeholder]="field.config[0] | field: 'placeholder'"
+                                                      [formControlName]="field.code"
+                                    ></app-simple-input>
+                                </ng-container>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                </p-tabPanel>
+            </ng-container>
+<!--                <label>Создание сделки</label>-->
+<!--                <div class="const-data green">{{_entity.addDate | mDate}}</div>-->
+<!--                <label>Закрытие сделки</label>-->
+<!--                <app-calendar formControlName="closeDate" placeholder="Выберите дату закрытия сделки ..."-->
+<!--                              dateFormat="dddd, DD MMMM YYYY г."-->
+<!--                ></app-calendar>-->
 
-                <label>Сделка</label>
-                <app-dropdown [options]="dealClass.typeArray"  formControlName="type"
-                              optionLabel="label" [showClear]="false" scrollHeight="300px"
-                ></app-dropdown>
+<!--                <label>Сделка</label>-->
+<!--                <app-dropdown [options]="dealClass.typeArray"  formControlName="type"-->
+<!--                              optionLabel="label" [showClear]="false" scrollHeight="300px"-->
+<!--                ></app-dropdown>-->
 
-                <label>Квалификация</label>
-                <app-dropdown [options]="dealClass.qualificationArray" optionLabel="label" formControlName="qualification" [showClear]="false" scrollHeight="300px"
-                ></app-dropdown>
-                <label>Стадия / Статус</label>
-                <app-dropdown [options]="stageArray"  formControlName="stage"
-                              optionLabel="label" [showClear]="false" scrollHeight="300px" [group]="true"
-                ></app-dropdown>
-                <label>Теги</label>
-                <app-dropdown-tag formControlName="tag"></app-dropdown-tag>
-                <div class="sub-form">Объект права</div>
+<!--                <label>Квалификация</label>-->
+<!--                <app-dropdown [options]="dealClass.qualificationArray" optionLabel="label" formControlName="qualification" [showClear]="false" scrollHeight="300px"-->
+<!--                ></app-dropdown>-->
+<!--                <label>Стадия / Статус</label>-->
+<!--                <app-dropdown [options]="stageArray"  formControlName="stage"-->
+<!--                              optionLabel="label" [showClear]="false" scrollHeight="300px" [group]="true"-->
+<!--                ></app-dropdown>-->
+<!--                <label>Теги</label>-->
+<!--                <app-dropdown-tag formControlName="tag"></app-dropdown-tag>-->
+<!--                <div class="sub-form">Объект права</div>-->
 
-                <label>Тип недвижимости</label>
-                <app-dropdown [options]="dealClass.propertyTypeArray"  formControlName="propertyType"
-                              optionLabel="label" [showClear]="false" scrollHeight="300px"
-                ></app-dropdown>
-                <label>Количество комнат</label>
-                <app-simple-input></app-simple-input>
-                <div class="row-field">
-                    <label>Общая площадь</label>
-                    <p-inputNumber suffix=" кв.м." placeholder="кв.м."></p-inputNumber>
-                    <label>Жилая площадь</label>
-                    <p-inputNumber suffix=" кв.м." placeholder="кв.м."></p-inputNumber>
-                    <label>Площадь кухни</label>
-                    <p-inputNumber suffix=" кв.м." placeholder="кв.м."></p-inputNumber>
-                </div>
-                <ng-container *ngIf="form.get('propertyType')?.value === 'LAND' && form.get('type')?.value !== 'PURCHASE' && form.get('type')?.value !== 'RENT'">
-                    <label>Виды разрешенного использования</label>
-                    <app-chips-option placeholder="Введите вид разрешенного использования ..." formControlName="permittedUses" [items]="[]"></app-chips-option>
-                </ng-container>
+<!--                <label>Тип недвижимости</label>-->
+<!--                <app-dropdown [options]="dealClass.propertyTypeArray"  formControlName="propertyType"-->
+<!--                              optionLabel="label" [showClear]="false" scrollHeight="300px"-->
+<!--                ></app-dropdown>-->
+<!--                <label>Количество комнат</label>-->
+<!--                <app-simple-input></app-simple-input>-->
+<!--                <div class="row-field">-->
+<!--                    <label>Общая площадь</label>-->
+<!--                    <p-inputNumber suffix=" кв.м." placeholder="кв.м."></p-inputNumber>-->
+<!--                    <label>Жилая площадь</label>-->
+<!--                    <p-inputNumber suffix=" кв.м." placeholder="кв.м."></p-inputNumber>-->
+<!--                    <label>Площадь кухни</label>-->
+<!--                    <p-inputNumber suffix=" кв.м." placeholder="кв.м."></p-inputNumber>-->
+<!--                </div>-->
+<!--                <ng-container *ngIf="form.get('propertyType')?.value === 'LAND' && form.get('type')?.value !== 'PURCHASE' && form.get('type')?.value !== 'RENT'">-->
+<!--                    <label>Виды разрешенного использования</label>-->
+<!--                    <app-chips-option placeholder="Введите вид разрешенного использования ..." formControlName="permittedUses" [items]="[]"></app-chips-option>-->
+<!--                </ng-container>-->
 
-                <div class="sub-form">Дополнительно</div>
-                <textarea rows="1" cols="30" pInputTextarea  [autoResize]="true" formControlName="description"  placeholder="Введите дополнительную информацию ..."
-                ></textarea>
+<!--                <div class="sub-form">Дополнительно</div>-->
+<!--                <textarea rows="1" cols="30" pInputTextarea  [autoResize]="true" formControlName="description"  placeholder="Введите дополнительную информацию ..."-->
+<!--                ></textarea>-->
 
-                <ng-container *ngIf="form.get('type')?.value !== 'PURCHASE' && form.get('type')?.value !== 'RENT'">
-                    <div class="sub-form">Мусор</div>
-                    <label>Кадастровый номер</label>
-                    <app-simple-input placeholder="Добавить кадастровый номер ..." formControlName="cadastralNumber"></app-simple-input>
-                    <label>Вид права</label>
-                    <app-dropdown [options]="dealClass.propertyRightArray" formControlName="propertyRight"  optionLabel="label" [showClear]="false" scrollHeight="300px"
-                    ></app-dropdown>
-                    <label>Документы основания</label>
-                    <textarea rows="1" cols="30" pInputTextarea #textarea [autoResize]="true" formControlName="titleDeeds"
-                              placeholder="Добавить документ основания ..."
-                    ></textarea>
-                    <label>Ограничения права</label>
-                    <textarea rows="1" cols="30" pInputTextarea #textarea [autoResize]="true" formControlName="encumbrance"
-                              placeholder="Добавить обременение ..."
-                    ></textarea>
-                </ng-container>
-            </p-tabPanel>
-            <p-tabPanel header="Объект">
-                <div class="sub-form">Общее описание</div>
-                <label>Объект сделки</label>
-                <app-dropdown [options]="dealClass.propertyTypes"
-                              formControlName="objectType"  scrollHeight="400px" [showClear]="false" optionLabel="label"
-                              [group]="true"
-                ></app-dropdown>
+<!--                <ng-container *ngIf="form.get('type')?.value !== 'PURCHASE' && form.get('type')?.value !== 'RENT'">-->
+<!--                    <div class="sub-form">Мусор</div>-->
+<!--                    <label>Кадастровый номер</label>-->
+<!--                    <app-simple-input placeholder="Добавить кадастровый номер ..." formControlName="cadastralNumber"></app-simple-input>-->
+<!--                    <label>Вид права</label>-->
+<!--                    <app-dropdown [options]="dealClass.propertyRightArray" formControlName="propertyRight"  optionLabel="label" [showClear]="false" scrollHeight="300px"-->
+<!--                    ></app-dropdown>-->
+<!--                    <label>Документы основания</label>-->
+<!--                    <textarea rows="1" cols="30" pInputTextarea #textarea [autoResize]="true" formControlName="titleDeeds"-->
+<!--                              placeholder="Добавить документ основания ..."-->
+<!--                    ></textarea>-->
+<!--                    <label>Ограничения права</label>-->
+<!--                    <textarea rows="1" cols="30" pInputTextarea #textarea [autoResize]="true" formControlName="encumbrance"-->
+<!--                              placeholder="Добавить обременение ..."-->
+<!--                    ></textarea>-->
+<!--                </ng-container>-->
+<!--            </p-tabPanel>-->
+            <p-tabPanel header="Редактор">
                 <div (click)="customizer.show()">Добавить</div>
 <!--                <div *ngFor="let param of tempArray">-->
 <!--                    <label>{{param.label}}</label>-->
@@ -111,97 +153,97 @@
 <!--                                   [options]="param.value.array"-->
 <!--                ></app-overlay-panel>-->
             </p-tabPanel>
-            <p-tabPanel header="Геолокация">
-                <div class="sub-form">Местоположение</div>
-                <ng-container *ngIf="form.controls['type']?.value === 'SALE' || form.controls['type']?.value === 'ALTERNATIVE'
-                        || form.controls['type']?.value === 'LEASE'; else addressBuy"
-                >
-                    <app-address-input-short *ngIf="form.get('type')?.value !== 'PURCHASE' && form.get('type')?.value !== 'RENT'"
-                                             formControlName="address"
-                                             label="Адрес объекта сделки"
-                                             (locationChanges)="form.controls['location'].setValue($event)"
-                                             (remove)="mapArray.clear(); recalcInfrastructureDisplay();"
-                                             (additionalDataChanges)="districts = $event.districts;
-                                                form.controls['apartment'].setValue($event.apartment);
-                                                form.controls['entrance'].setValue($event.entrance);
-                                                form.controls['floor'].setValue($event.floor);
-                                             "
-                    ></app-address-input-short>
-                    <div class="row-field">
-                        <label>Номер подъезда</label>
-                        <p-inputNumber formControlName="entrance" suffix=" подъезд" placeholder="Подъезд"></p-inputNumber>
-                        <label>Номер этажа</label>
-                        <p-inputNumber formControlName="floor" suffix=" этаж" placeholder="Этаж"></p-inputNumber>
-                        <label>{{form.controls['propertyType'].value == 'LIVING' ? 'Номер квартиры' : 'Помещение'}}</label>
-                        <p-inputNumber formControlName="apartment"
-                                       [suffix]="form.controls['propertyType'].value == 'LIVING' ? ' квартира': ' помещение'"
-                                       [placeholder]="form.controls['propertyType'].value == 'LIVING' ? 'Квартира' : 'Помещение'"
-                        ></p-inputNumber>
-                    </div>
-                    <label>Административный район, Жилой комплекс ...</label>
-                    <app-chips-option [value]="districts" placeholder="Добавьте район или жилой комплекс ...">
-                    </app-chips-option>
-                </ng-container>
-                <ng-template #addressBuy>
-                    <label>Требования к местоположению</label>
-                    <textarea rows="1" cols="30" pInputTextarea [autoResize]="true" formControlName="description"
-                              placeholder="Введите требования ..."
-                    ></textarea>
-                </ng-template>
-                <ng-container *ngTemplateOutlet="propertyData; context: {$implicit: getPropertyStatusData()}"></ng-container>
-                <ng-template #propertyData let-data>
-                    <ng-container *ngIf="houseTypes.length > 0">
-                        <label>{{ data.houseTypesLabel }}</label>
-                        <app-multiselect *ngIf="data.multi"
-                                         [params]="houseTypes" [group]="false" optionLabel="label" [showHeader]="false"
-                                         [placeholder]="data.houseTypesPlaceholder"  formControlName="houseTypes" scrollHeight="300px"
-                        ></app-multiselect>
-                        <app-dropdown *ngIf="!data.multi"
-                                      [options]="houseTypes" (ngModelChange)="form.get('houseTypes')!.setValue([$event])"
-                                      [ngModel]="form.get('houseTypes')!.value[0]" [ngModelOptions]="{standalone: true}"
-                                      optionLabel="label" [showClear]="false" scrollHeight="300px"
-                        ></app-dropdown>
-                    </ng-container>
-                    <label>{{ data.propertyStatusLabel }}</label>
-                    <app-multiselect *ngIf="data.multi"
-                                     [params]="data.propertyStatusData" [group]="false"
-                                     [placeholder]="data.propertyStatusPlaceholder"
-                                     formControlName="propertyStatuses"  scrollHeight="300px" [showHeader]="false"
-                    ></app-multiselect>
-                    <app-dropdown *ngIf="!data.multi"
-                                  [options]="data.propertyStatusData" (ngModelChange)="form.get('propertyStatuses')!.setValue([$event])"
-                                  [ngModel]="form.get('propertyStatuses')!.value[0]" [ngModelOptions]="{standalone: true}"
-                                  optionLabel="label" [showClear]="false" scrollHeight="300px"
-                    ></app-dropdown>
-                    <ng-container *ngIf="form.get('propertyType')?.value != 'LAND'">
-                        <label  pTooltip="Какой-то текст" tooltipPosition="top">Календарь готовности дома</label>
-                        <app-calendar formControlName="readyDate" [dateFormat]="data.dateFormat" placeholder="Выберите дату ..."
-                                      [selectionMode]="data.selectionMode" [view]="data.view"
-                        >
-                        </app-calendar>
-                    </ng-container>
+<!--            <p-tabPanel header="Геолокация">-->
+<!--                <div class="sub-form">Местоположение</div>-->
+<!--                <ng-container *ngIf="form.controls['type']?.value === 'SALE' || form.controls['type']?.value === 'ALTERNATIVE'-->
+<!--                        || form.controls['type']?.value === 'LEASE'; else addressBuy"-->
+<!--                >-->
+<!--                    <app-address-input-short *ngIf="form.get('type')?.value !== 'PURCHASE' && form.get('type')?.value !== 'RENT'"-->
+<!--                                             formControlName="address"-->
+<!--                                             label="Адрес объекта сделки"-->
+<!--                                             (locationChanges)="form.controls['location'].setValue($event)"-->
+<!--                                             (remove)="mapArray.clear(); recalcInfrastructureDisplay();"-->
+<!--                                             (additionalDataChanges)="districts = $event.districts;-->
+<!--                                                form.controls['apartment'].setValue($event.apartment);-->
+<!--                                                form.controls['entrance'].setValue($event.entrance);-->
+<!--                                                form.controls['floor'].setValue($event.floor);-->
+<!--                                             "-->
+<!--                    ></app-address-input-short>-->
+<!--                    <div class="row-field">-->
+<!--                        <label>Номер подъезда</label>-->
+<!--                        <p-inputNumber formControlName="entrance" suffix=" подъезд" placeholder="Подъезд"></p-inputNumber>-->
+<!--                        <label>Номер этажа</label>-->
+<!--                        <p-inputNumber formControlName="floor" suffix=" этаж" placeholder="Этаж"></p-inputNumber>-->
+<!--                        <label>{{form.controls['propertyType'].value == 'LIVING' ? 'Номер квартиры' : 'Помещение'}}</label>-->
+<!--                        <p-inputNumber formControlName="apartment"-->
+<!--                                       [suffix]="form.controls['propertyType'].value == 'LIVING' ? ' квартира': ' помещение'"-->
+<!--                                       [placeholder]="form.controls['propertyType'].value == 'LIVING' ? 'Квартира' : 'Помещение'"-->
+<!--                        ></p-inputNumber>-->
+<!--                    </div>-->
+<!--                    <label>Административный район, Жилой комплекс ...</label>-->
+<!--                    <app-chips-option [value]="districts" placeholder="Добавьте район или жилой комплекс ...">-->
+<!--                    </app-chips-option>-->
+<!--                </ng-container>-->
+<!--                <ng-template #addressBuy>-->
+<!--                    <label>Требования к местоположению</label>-->
+<!--                    <textarea rows="1" cols="30" pInputTextarea [autoResize]="true" formControlName="description"-->
+<!--                              placeholder="Введите требования ..."-->
+<!--                    ></textarea>-->
+<!--                </ng-template>-->
+<!--                <ng-container *ngTemplateOutlet="propertyData; context: {$implicit: getPropertyStatusData()}"></ng-container>-->
+<!--                <ng-template #propertyData let-data>-->
+<!--                    <ng-container *ngIf="houseTypes.length > 0">-->
+<!--                        <label>{{ data.houseTypesLabel }}</label>-->
+<!--                        <app-multiselect *ngIf="data.multi"-->
+<!--                                         [params]="houseTypes" [group]="false" optionLabel="label" [showHeader]="false"-->
+<!--                                         [placeholder]="data.houseTypesPlaceholder"  formControlName="houseTypes" scrollHeight="300px"-->
+<!--                        ></app-multiselect>-->
+<!--                        <app-dropdown *ngIf="!data.multi"-->
+<!--                                      [options]="houseTypes" (ngModelChange)="form.get('houseTypes')!.setValue([$event])"-->
+<!--                                      [ngModel]="form.get('houseTypes')!.value[0]" [ngModelOptions]="{standalone: true}"-->
+<!--                                      optionLabel="label" [showClear]="false" scrollHeight="300px"-->
+<!--                        ></app-dropdown>-->
+<!--                    </ng-container>-->
+<!--                    <label>{{ data.propertyStatusLabel }}</label>-->
+<!--                    <app-multiselect *ngIf="data.multi"-->
+<!--                                     [params]="data.propertyStatusData" [group]="false"-->
+<!--                                     [placeholder]="data.propertyStatusPlaceholder"-->
+<!--                                     formControlName="propertyStatuses"  scrollHeight="300px" [showHeader]="false"-->
+<!--                    ></app-multiselect>-->
+<!--                    <app-dropdown *ngIf="!data.multi"-->
+<!--                                  [options]="data.propertyStatusData" (ngModelChange)="form.get('propertyStatuses')!.setValue([$event])"-->
+<!--                                  [ngModel]="form.get('propertyStatuses')!.value[0]" [ngModelOptions]="{standalone: true}"-->
+<!--                                  optionLabel="label" [showClear]="false" scrollHeight="300px"-->
+<!--                    ></app-dropdown>-->
+<!--                    <ng-container *ngIf="form.get('propertyType')?.value != 'LAND'">-->
+<!--                        <label  pTooltip="Какой-то текст" tooltipPosition="top">Календарь готовности дома</label>-->
+<!--                        <app-calendar formControlName="readyDate" [dateFormat]="data.dateFormat" placeholder="Выберите дату ..."-->
+<!--                                      [selectionMode]="data.selectionMode" [view]="data.view"-->
+<!--                        >-->
+<!--                        </app-calendar>-->
+<!--                    </ng-container>-->
 
-                </ng-template>
-<!--                <div class="p-component p-input split-button" >-->
-<!--                    <span pTooltip="{{form.controls['type']?.value === 'SALE' || form.controls['type']?.value === 'ALTERNATIVE'-->
-<!--                        || form.controls['type']?.value === 'LEASE' ? 'Добавьте ближайшее окружение объекта сделки, для этого выберите на карте: остановки, станции, объекты инфраструктуры ...'-->
-<!--                    : 'Определите поиск будущего объекта сделки, для этого выберите интересующие вас адреса и выделите локации поиска ...'}} "-->
-<!--                          tooltipPosition="top" tooltipStyleClass="map"-->
-<!--                    >Перейти на карту ...</span>-->
-<!--                    <button (click)="openMap()"><i class="pi pi-chevron-right"></i></button>-->
-<!--                </div>-->
+<!--                </ng-template>-->
+<!--&lt;!&ndash;                <div class="p-component p-input split-button" >&ndash;&gt;-->
+<!--&lt;!&ndash;                    <span pTooltip="{{form.controls['type']?.value === 'SALE' || form.controls['type']?.value === 'ALTERNATIVE'&ndash;&gt;-->
+<!--&lt;!&ndash;                        || form.controls['type']?.value === 'LEASE' ? 'Добавьте ближайшее окружение объекта сделки, для этого выберите на карте: остановки, станции, объекты инфраструктуры ...'&ndash;&gt;-->
+<!--&lt;!&ndash;                    : 'Определите поиск будущего объекта сделки, для этого выберите интересующие вас адреса и выделите локации поиска ...'}} "&ndash;&gt;-->
+<!--&lt;!&ndash;                          tooltipPosition="top" tooltipStyleClass="map"&ndash;&gt;-->
+<!--&lt;!&ndash;                    >Перейти на карту ...</span>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <button (click)="openMap()"><i class="pi pi-chevron-right"></i></button>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
 
-                <ng-container [ngTemplateOutlet]="infrastructure" [ngTemplateOutletContext]="{$implicit: infrastructureDisplay}"
-                ></ng-container>
-                <ng-template #infrastructure let-arrays>
-                    <ng-container *ngFor="let obj of arrays">
-                        <div class="sub-form" (click)="openMap()">{{obj.label}} <i class="pi pi-chevron-down"></i></div>
-                        <app-more-less-view [elementSize]="obj.array.length" [maxLines]="4" [lineHeight]="50">
-                            <app-geo-billet [data]="data" *ngFor="let data of obj.array" (click)="openMap(data)" (delete)="removeFromMap(data)"></app-geo-billet>
-                        </app-more-less-view>
-                    </ng-container>
-                </ng-template>
-            </p-tabPanel>
+<!--                <ng-container [ngTemplateOutlet]="infrastructure" [ngTemplateOutletContext]="{$implicit: infrastructureDisplay}"-->
+<!--                ></ng-container>-->
+<!--                <ng-template #infrastructure let-arrays>-->
+<!--                    <ng-container *ngFor="let obj of arrays">-->
+<!--                        <div class="sub-form" (click)="openMap()">{{obj.label}} <i class="pi pi-chevron-down"></i></div>-->
+<!--                        <app-more-less-view [elementSize]="obj.array.length" [maxLines]="4" [lineHeight]="50">-->
+<!--                            <app-geo-billet [data]="data" *ngFor="let data of obj.array" (click)="openMap(data)" (delete)="removeFromMap(data)"></app-geo-billet>-->
+<!--                        </app-more-less-view>-->
+<!--                    </ng-container>-->
+<!--                </ng-template>-->
+<!--            </p-tabPanel>-->
         </p-tabView>
     </form>
 

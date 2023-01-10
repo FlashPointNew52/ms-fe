@@ -1,0 +1,13 @@
+p-dropdown ::ng-deep{
+    .p-dropdown-items{
+        display: flex;
+        justify-content: space-around;
+
+        .p-dropdown-item{
+            padding: 8px 15px;
+            border-radius: 50%;
+        }
+    }
+}
+
+

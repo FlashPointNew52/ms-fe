@@ -1,0 +1,66 @@
+<!--<div (click)="toggle($event)" class="sub-form">{{ label }} <i class="pi pi-chevron-down"></i></div>-->
+<!--<app-more-less-view [elementSize]="value.length" [maxLines]="4" [lineHeight]="50">-->
+<!--    <div class="billet-container" *ngFor="let item of value">-->
+<!--        <div>{{item.label}}</div>-->
+<!--        <div>{{item.description || 'Введите описание'}}</div>-->
+<!--    </div>-->
+<!--</app-more-less-view>-->
+<!--<p-overlayPanel #overlay showTransitionOptions="0s" hideTransitionOptions="0s" styleClass="double-list">-->
+
+<!--    <ng-template pTemplate>-->
+<!--        <ng-container *ngFor="let config of options">-->
+<!--            <p-radioButton [label]="config.label" [value]="config" [(ngModel)]="selectedConfig">-->
+<!--            </p-radioButton>-->
+<!--            <div [ngSwitch]="config.type" *ngIf="selectedConfig == config">-->
+<!--                <app-dropdown *ngSwitchCase="FieldType.CHOICE" [group]="(config | field: 'group') || false"-->
+<!--                              [options]="config | field: 'options'"-->
+<!--                ></app-dropdown>-->
+<!--                <app-multiselect *ngSwitchCase="FieldType.MULTI_CHOICE"-->
+<!--                                 [params]="config | field: 'options'"-->
+<!--                ></app-multiselect>-->
+<!--                <app-dropdown *ngSwitchCase="FieldType.DEPENDED_CHOICE"-->
+<!--                              [options]="config | field: 'options'"-->
+<!--                ></app-dropdown>-->
+<!--                <app-dropdown-tag *ngSwitchCase="FieldType.TAGS"></app-dropdown-tag>-->
+<!--                <textarea *ngSwitchCase="FieldType.TEXTAREA" [placeholder]="config | field: 'placeholder'"-->
+<!--                          rows="1" cols="30" pInputTextarea [autoResize]="true" [disabled]="true"-->
+<!--                ></textarea>-->
+<!--                <app-calendar *ngSwitchCase="FieldType.DATE"-->
+<!--                              [placeholder]="config | field: 'placeholder'"-->
+<!--                ></app-calendar>-->
+<!--                <ng-container *ngSwitchCase="FieldType.RANGE">-->
+<!--                    <app-simple-input [placeholder]="config | field: 'placeholder'"-->
+<!--                                      [disabled]="true"-->
+<!--                    ></app-simple-input>-->
+<!--                    <app-simple-input [placeholder]="config | field: 'placeholder'"-->
+<!--                                      [disabled]="true"-->
+<!--                    ></app-simple-input>-->
+<!--                </ng-container>-->
+<!--                <app-simple-input *ngSwitchDefault-->
+<!--                                  [placeholder]="config | field: 'placeholder'"-->
+<!--                                  [disabled]="true"-->
+<!--                ></app-simple-input>-->
+<!--            </div>-->
+<!--        </ng-container>-->
+<!--        <div *ngIf="page == 0; else list" class="options wrapper" [class.multiply]="multiply">-->
+<!--            <div *ngFor="let option of options" class="option" [class.added]="alreadyAdd[option.code]"-->
+<!--                 [pTooltip]="option?.description" tooltipPosition="top" tooltipStyleClass="map"-->
+<!--            >-->
+<!--                <div (click)="addField(option); overlayResize($event, overlay)">{{option.label}}</div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </ng-template>-->
+<!--    <ng-template #list>-->
+<!--        <div class="list wrapper">-->
+<!--            <div *ngFor="let item of value; let i = index" class="block">-->
+<!--                <div>{{item.label}}</div>-->
+<!--                <i class="pi pi-times" (click)="remove(i, item.code)"></i>-->
+<!--                <textarea pInputTextarea [autoResize]="true" [(ngModel)]="item.description" rows="1"-->
+<!--                          placeholder="Введите описание ..."-->
+<!--                ></textarea>-->
+
+<!--            </div>-->
+<!--            <button (click)="page = 0; overlayResize($event, overlay)">Добавить</button>-->
+<!--        </div>-->
+<!--    </ng-template>-->
+<!--</p-overlayPanel>-->

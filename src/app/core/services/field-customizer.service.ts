@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
+import {SelectedField} from "../component/viewElements/field-customizer-view/field-customizer-view.component";
 
 export enum FieldType {
     TEXT,
     AUTO,
     NUMBER,
+    INLINE_CHOICE,
     CHOICE,
+    MULTI_CHOICE,
     DATE,
     SEARCH,
     TAGS,
@@ -14,12 +17,24 @@ export enum FieldType {
 }
 
 interface Config {
-    type: FieldType,
-    label: string
+    type: FieldType
 }
 
 export interface ChoiceConfig extends Config {
     type: FieldType.CHOICE,
+    options: any[],
+    group?: boolean
+}
+
+export interface InlineChoiceConfig extends Config {
+    type: FieldType.INLINE_CHOICE,
+    placeholder: string
+    options: any[],
+    postfix?: string | Function;
+}
+
+export interface MultiChoiceConfig extends Config {
+    type: FieldType.MULTI_CHOICE,
     options: any[]
 }
 
@@ -63,7 +78,9 @@ export interface TextareaConfig extends Config {
 export interface DependedChoiceConfig extends Config {
     type: FieldType.DEPENDED_CHOICE,
     dependedField: string,
-    options: { [key: string]: any[] }
+    options: { [key: string]: any[] },
+    group?: boolean,
+    editable?: boolean
 }
 
 export interface RangeConfig extends Config {
@@ -71,10 +88,11 @@ export interface RangeConfig extends Config {
     placeholder: string
 }
 
-export type FieldConfig = ChoiceConfig | TextConfig | DateConfig | SearchConfig | TagsConfig | DependedChoiceConfig | TextareaConfig | RangeConfig | NumberConfig | AutoConfig;
+export type FieldConfig = ChoiceConfig | InlineChoiceConfig | TextConfig | DateConfig | SearchConfig | TagsConfig | DependedChoiceConfig
+    | TextareaConfig | RangeConfig | NumberConfig | AutoConfig | MultiChoiceConfig;
 
 export type Field = {
-    label: string;
+    label: string | any;
     code: string;
     isOneOff: boolean;
     editable: boolean;
@@ -82,17 +100,9 @@ export type Field = {
     removable: boolean;
 }
 
-export interface Subgroup {
-    label: string;
-    fields: Field[];
-}
-
 export type FieldGroup = {
     label: string;
     fields: Field[];
-    subgroups: {
-        [key: string]: Subgroup
-    };
 }
 
 export type FieldGroups = {
@@ -437,6 +447,224 @@ export class FieldCustomizerService {
         {label: FieldCustomizerService.commissionStatusHash.COMMISSION_FULLY.label, code: 'COMMISSION_FULLY'}
     ];
 
+    public static readonly objectTypeHash = {
+        PART_APARTMENT: { label: 'Часть квартиры'},
+        PART_HOUSE: { label: 'Часть жилого дома'},
+        ROOM: { label:  'Комната'},
+        FLAT: { label: 'Квартира'},
+        HOUSE: { label: 'Индивидуальный жилой дом'},
+
+        APARTMENT: { label: 'Апартаменты'},
+        PARKING_PLACE: { label: 'Машиноместо'},
+        OFFICE: { label: 'Офисное помещение'},
+        STOREHOUSE: { label: 'Кладовка'},
+        STORAGE: { label: 'Склад'},
+        RETAIL_SPACE: { label: 'Торговый зал'},
+        FREE_SPACE: { label: 'Помещение свободного назначения'},
+        PAVILION: { label: 'Павильон'},
+        WORK_PLACE: { label: 'Рабочий участок'},
+        GILD: { label: 'Цех'},
+
+        GARDEN_LAND: { label: 'Садовый земельный участок'},
+        VEGETABLE_LAND: { label: 'Огородный земельный участок'},
+        FIELD_LAND: { label: 'Полевой земельный участок'},
+        HOMESTEAD_LAND: { label: 'Приусадебный земельный участок'},
+        HOME_LAND: { label: 'Придомовой земельный участок'}
+    };
+
+    public static readonly objectTypes = [
+        {label: 'Жилая недвижимость', value: "LIVING", items: [
+                {label: FieldCustomizerService.objectTypeHash.ROOM.label, code: 'ROOM'},
+                {label: FieldCustomizerService.objectTypeHash.FLAT.label, code: 'FLAT'},
+                {label: FieldCustomizerService.objectTypeHash.HOUSE.label, code: 'HOUSE'},
+                {label: FieldCustomizerService.objectTypeHash.PART_APARTMENT.label, code: 'PART_APARTMENT'},
+                {label: FieldCustomizerService.objectTypeHash.PART_HOUSE.label, code: 'PART_HOUSE'}
+            ]},
+        {label: 'Коммерческая недвижимость',  value: "COMMERCIAL", items: [
+                {label: FieldCustomizerService.objectTypeHash.APARTMENT.label, code: 'APARTMENT'},
+                {label: FieldCustomizerService.objectTypeHash.PARKING_PLACE.label, code: 'PARKING_PLACE'},
+                {label: FieldCustomizerService.objectTypeHash.OFFICE.label, code: 'OFFICE'},
+                {label: FieldCustomizerService.objectTypeHash.STOREHOUSE.label, code: 'STOREHOUSE'},
+                {label: FieldCustomizerService.objectTypeHash.STORAGE.label, code: 'STORAGE'},
+                {label: FieldCustomizerService.objectTypeHash.RETAIL_SPACE.label, code: 'RETAIL_SPACE'},
+                {label: FieldCustomizerService.objectTypeHash.FREE_SPACE.label, code: 'FREE_SPACE'},
+                {label: FieldCustomizerService.objectTypeHash.PAVILION.label, code: 'PAVILION'},
+                {label: FieldCustomizerService.objectTypeHash.WORK_PLACE.label, code: 'WORK_PLACE'},
+                {label: FieldCustomizerService.objectTypeHash.GILD.label, code: 'GILD'}
+            ]},
+        {label: 'Земельный участок', value: "LAND", items: [
+                {label: FieldCustomizerService.objectTypeHash.GARDEN_LAND.label, code: 'GARDEN_LAND'},
+                {label: FieldCustomizerService.objectTypeHash.VEGETABLE_LAND.label, code: 'VEGETABLE_LAND'},
+                {label: FieldCustomizerService.objectTypeHash.FIELD_LAND.label, code: 'FIELD_LAND'},
+                {label: FieldCustomizerService.objectTypeHash.HOMESTEAD_LAND.label, code: 'HOMESTEAD_LAND'},
+                {label: FieldCustomizerService.objectTypeHash.HOME_LAND.label, code: 'HOME_LAND'}
+            ]},
+    ];
+
+    public static readonly planningHash = {
+        TWO_LEVEL: {label: 'Двухуровневая планировка'},
+        MEZZANINE_FLOOR: {label: 'Антресольный этаж'},
+        FREE: {label: 'Свободной планировки'},
+        ISOLATED: {label: 'Изолированные комнаты'},
+        ADJOINING: {label: 'Смежные комнаты'},
+        ADJOINING_ISOLATED: {label: 'Смежно-изолированные комнаты'},
+        TYPICAL: {label: 'Типовая'},
+        REPLANNED: {label: 'Перепланированная'},
+
+        CENTRIC: {label: 'Центрическая'},
+        CORRIDOR: {label: 'Коридорная'},
+        ENFILADE: {label: 'Анфиладная'},
+        LAYERED: {label: 'Многоуровневая'},
+        GALLERY: {label: 'Галерейная'},
+        AMERICAN_SCHEME: {label: 'Американская схема'},
+        HALL_SCHEME: {label: 'Зальная схема'},
+        SECTIONAL: {label: 'Секционная'},
+        MIXED: {label: 'Смешанная'},
+
+        CLOSED: {label: 'Закрытая'},
+        OPEN_SPACE: {label: 'Открытая'},
+        COWORKING: {label: 'Коворкинг'}
+    };
+
+    public static readonly plannings = {
+        ROOM: [],
+        FLAT: [
+            {label: FieldCustomizerService.planningHash.TWO_LEVEL.label, code: 'TWO_LEVEL'},
+            {label: FieldCustomizerService.planningHash.MEZZANINE_FLOOR.label, code: 'MEZZANINE_FLOOR'},
+            {label: FieldCustomizerService.planningHash.FREE.label, code: 'FREE'},
+            {label: FieldCustomizerService.planningHash.ISOLATED.label, code: 'ISOLATED'},
+            {label: FieldCustomizerService.planningHash.ADJOINING.label, code: 'ADJOINING'},
+            {label: FieldCustomizerService.planningHash.ADJOINING_ISOLATED.label, code: 'ADJOINING_ISOLATED'},
+            {label: FieldCustomizerService.planningHash.TYPICAL.label, code: 'TYPICAL'},
+            {label: FieldCustomizerService.planningHash.REPLANNED.label, code: 'REPLANNED'}
+        ],
+        APARTMENT: [
+            {label: FieldCustomizerService.planningHash.TWO_LEVEL.label, code: 'TWO_LEVEL'},
+            {label: FieldCustomizerService.planningHash.MEZZANINE_FLOOR.label, code: 'MEZZANINE_FLOOR'},
+            {label: FieldCustomizerService.planningHash.FREE.label, code: 'FREE'},
+            {label: FieldCustomizerService.planningHash.ISOLATED.label, code: 'ISOLATED'},
+            {label: FieldCustomizerService.planningHash.ADJOINING.label, code: 'ADJOINING'},
+            {label: FieldCustomizerService.planningHash.ADJOINING_ISOLATED.label, code: 'ADJOINING_ISOLATED'},
+            {label: FieldCustomizerService.planningHash.TYPICAL.label, code: 'TYPICAL'},
+            {label: FieldCustomizerService.planningHash.REPLANNED.label, code: 'REPLANNED'}
+        ],
+        HOUSE: [
+            {label: FieldCustomizerService.planningHash.FREE.label, code: 'FREE'},
+            {label: FieldCustomizerService.planningHash.CENTRIC.label, code: 'CENTRIC'},
+            {label: FieldCustomizerService.planningHash.CORRIDOR.label, code: 'CORRIDOR'},
+            {label: FieldCustomizerService.planningHash.ENFILADE.label, code: 'ENFILADE'},
+            {label: FieldCustomizerService.planningHash.LAYERED.label, code: 'LAYERED'},
+            {label: FieldCustomizerService.planningHash.GALLERY.label, code: 'GALLERY'},
+            {label: FieldCustomizerService.planningHash.AMERICAN_SCHEME.label, code: 'AMERICAN_SCHEME'},
+            {label: FieldCustomizerService.planningHash.HALL_SCHEME.label, code: 'HALL_SCHEME'},
+            {label: FieldCustomizerService.planningHash.SECTIONAL.label, code: 'SECTIONAL'},
+            {label: FieldCustomizerService.planningHash.MIXED.label, code: 'MIXED'},
+        ],
+        OFFICE: [
+            {label: FieldCustomizerService.planningHash.TWO_LEVEL.label, code: 'TWO_LEVEL'},
+            {label: FieldCustomizerService.planningHash.MEZZANINE_FLOOR.label, code: 'MEZZANINE_FLOOR'},
+            {label: FieldCustomizerService.planningHash.CLOSED.label, code: 'CLOSED'},
+            {label: FieldCustomizerService.planningHash.OPEN_SPACE.label, code: 'OPEN_SPACE'},
+            {label: FieldCustomizerService.planningHash.MIXED.label, code: 'MIXED'},
+            {label: FieldCustomizerService.planningHash.COWORKING.label, code: 'COWORKING'},
+        ],
+        PART_APARTMENT: [],
+        PART_HOUSE: [],
+        PARKING_PLACE: [],
+        STOREHOUSE: [],
+        STORAGE: [],
+        RETAIL_SPACE: [],
+        FREE_SPACE: [],
+        PAVILION: [],
+        WORK_PLACE: [],
+        GILD: [],
+        GARDEN_LAND: [],
+        VEGETABLE_LAND: [],
+        FIELD_LAND: [],
+        HOMESTEAD_LAND: [],
+        HOME_LAND: []
+    };
+
+    public static readonly roomCountArray = [
+        {label: 'Студия', code: 0},
+        {label: '1', code: 1},
+        {label: '2', code: 2},
+        {label: '3', code: 3},
+        {label: '4', code: 4},
+        {label: '5', code: 5},
+        {label: '6', code: 6}
+    ]
+
+    public static readonly decorationHash = {
+        ROUGH: {label: 'Черновая отделка'},
+        PREFINE: {label: 'Предчистовая отделка'},
+        FINE: {label: 'Чистовая отделка'},
+        TURNKEY: {label: 'Отделка "Под ключ"'},
+        DESIGNER: {label: 'Дизайнерский проект'},
+        REQUIRE_COSMETIC: {label: 'Требуется косметический ремонт'},
+        REQUIRE_MAJOR_OVERHAUL: {label: 'Требуется капитальный ремонт'}
+    };
+
+    public static readonly decorations = [
+        {label: FieldCustomizerService.decorationHash.ROUGH.label, code: 'ROUGH'},
+        {label: FieldCustomizerService.decorationHash.PREFINE.label, code: 'PREFINE'},
+        {label: FieldCustomizerService.decorationHash.FINE.label, code: 'FINE'},
+        {label: FieldCustomizerService.decorationHash.TURNKEY.label, code: 'TURNKEY'},
+        {label: FieldCustomizerService.decorationHash.DESIGNER.label, code: 'DESIGNER'},
+        {label: FieldCustomizerService.decorationHash.REQUIRE_COSMETIC.label, code: 'REQUIRE_COSMETIC'},
+        {label: FieldCustomizerService.decorationHash.REQUIRE_MAJOR_OVERHAUL.label, code: 'REQUIRE_MAJOR_OVERHAUL'}
+    ];
+
+    public static readonly houseTypeHash = {
+        COTTAGE: {label: 'Коттедж'},
+        MANOR: {label: 'Усадьба'},
+        GARDEN_HOUSE: {label: 'Садовый дом'},
+        LOW_RISE_HOUSE: {label: 'Малоэтажный жилой дом'},
+        MID_RISE_HOUSE: {label: 'Среднеэтажный жилой дом'},
+        HIGH_RISE_HOUSE: {label: 'Многоэтажный жилой дом'},
+        TOWNHOUSE: {label: 'Таунхаус'},
+        DUPLEX: {label: 'Дуплекс'},
+
+        MULTIFUNCTIONAL_BUILDING: {label: 'Многофункциональный комплекс'},
+        OFFICE_BUILDING: {label: 'Офисное здание'},
+        MALL: {label: 'Торговый центр'},
+        BUSINESS_CENTER: {label: 'Бизнес центр'},
+        WAREHOUSE_COMPLEX: {label: 'Складской комплекс'},
+        INDUSTRIAL_BUILDING: {label: 'Промышленное здание'},
+    }
+
+    public static readonly houseType = [
+        {label: 'Индивидуальные жилые дома', value: "INDIVIDUAL_HOUSE", items: [
+                {label: FieldCustomizerService.houseTypeHash.COTTAGE.label, code: 'COTTAGE'},
+                {label: FieldCustomizerService.houseTypeHash.MANOR.label, code: 'MANOR'},
+                {label: FieldCustomizerService.houseTypeHash.GARDEN_HOUSE.label, code: 'GARDEN_HOUSE'}
+            ]},
+        {label: 'Многоквартирные жилые дома', value: "MULTISTORE_HOUSE", items: [
+                {label: FieldCustomizerService.houseTypeHash.LOW_RISE_HOUSE.label, code: 'LOW_RISE_HOUSE'},
+                {label: FieldCustomizerService.houseTypeHash.MID_RISE_HOUSE.label, code: 'MID_RISE_HOUSE'},
+                {label: FieldCustomizerService.houseTypeHash.HIGH_RISE_HOUSE.label, code: 'HIGH_RISE_HOUSE'}
+            ]},
+        {label: 'Дома блокированной застройки', value: "BLOCKED_HOUSE", items: [
+                {label: FieldCustomizerService.houseTypeHash.TOWNHOUSE.label, code: 'TOWNHOUSE'},
+                {label: FieldCustomizerService.houseTypeHash.DUPLEX.label, code: 'DUPLEX'}
+            ]},
+        {label: 'Общественные здания', value: "PUBLIC_BUILDINGS", items: [
+                {label: FieldCustomizerService.houseTypeHash.MULTIFUNCTIONAL_BUILDING.label, code: 'MULTIFUNCTIONAL_BUILDING'},
+                {label: FieldCustomizerService.houseTypeHash.OFFICE_BUILDING.label, code: 'OFFICE_BUILDING'},
+                {label: FieldCustomizerService.houseTypeHash.MALL.label, code: 'MALL'},
+                {label: FieldCustomizerService.houseTypeHash.BUSINESS_CENTER.label, code: 'BUSINESS_CENTER'},
+            ]},
+        {label: 'Производственные здания', value: "MANUFACTURE_BUILDINGS", items: [
+                {label: FieldCustomizerService.houseTypeHash.WAREHOUSE_COMPLEX.label, code: 'WAREHOUSE_COMPLEX'},
+                {label: FieldCustomizerService.houseTypeHash.INDUSTRIAL_BUILDING.label, code: 'INDUSTRIAL_BUILDING'},
+            ]},
+    ];
+
+    public static readonly yesNo = [
+        {label: 'Да', code: true},
+        {label: 'Нет', code: false}
+    ];
+
     public static readonly landTypeHash = {
         GARDEN_LAND: { label: 'Садовый земельный участок'},
         VEGETABLE_LAND: { label: 'Огородный земельный участок'},
@@ -511,10 +739,10 @@ export class FieldCustomizerService {
 
     public static readonly DEAL_FIELDS: Sections = {
         MAIN: {
-            label: 'Сделка (Общая)', groups: {
+            label: 'Общая', groups: {
                 DEAL:
                     {
-                        label: 'Сделка', subgroups: {}, fields: [
+                        label: 'Сделка', fields: [
                             {
                                 label: 'Дата создания сделки',
                                 code: 'createDate',
@@ -522,7 +750,7 @@ export class FieldCustomizerService {
                                 editable: false,
                                 removable: false,
                                 config:
-                                    [{type: FieldType.AUTO, label: 'Автоматическое заполнение', placeholder: '01 декабря 2021'}]
+                                    [{type: FieldType.DATE, placeholder: '01 декабря 2021'}]
                             },
                             {
                                 label: 'Тип сделки',
@@ -530,9 +758,7 @@ export class FieldCustomizerService {
                                 isOneOff: true,
                                 editable: false,
                                 removable: false,
-                                config: [
-                                    { type: FieldType.CHOICE, label: 'Выбор значения', options: FieldCustomizerService.dealTypeArray }
-                                ]
+                                config: [{type: FieldType.CHOICE, options: FieldCustomizerService.dealTypeArray}]
                             },
                             {
                                 label: 'Сделка',
@@ -542,7 +768,7 @@ export class FieldCustomizerService {
                                 removable: false,
                                 config: [
                                     {
-                                        type: FieldType.CHOICE, label: 'Выбор значения', options: FieldCustomizerService.dealArray
+                                        type: FieldType.CHOICE, options: FieldCustomizerService.dealArray
                                     }
                                 ]
                             },
@@ -553,16 +779,7 @@ export class FieldCustomizerService {
                                 editable: false,
                                 removable: false,
                                 config: [
-                                    {type: FieldType.CHOICE, label: 'Выбор значения', options: FieldCustomizerService.landTypeOptions },
-                                    {type: FieldType.SEARCH, label: 'Поиск по маркетинговым компаниям',
-                                        placeholder: 'Введите название маркетинговой компании'},
-                                    {type: FieldType.SEARCH, label: 'Поиск по рекламным компаниям',
-                                        placeholder: 'Введите название рекламной компании'},
-                                    {type: FieldType.SEARCH, label: 'Поиск по контактам',
-                                        placeholder: 'Введите название контакта'},
-                                    {type: FieldType.SEARCH, label: 'Поиск по организациям',
-                                        placeholder: 'Введите название организации'},
-                                    {type: FieldType.TEXT, label: 'Текстовое поле', placeholder: 'Введите источник привлечения'}
+                                    {type: FieldType.TEXT, placeholder: 'Парсер' }
                                 ]
                             },
                             {
@@ -571,7 +788,7 @@ export class FieldCustomizerService {
                                 isOneOff: true,
                                 editable: false,
                                 removable: false,
-                                config: [{type: FieldType.TEXT, label: 'Текстовое поле', placeholder: 'Введите заголовок сделки'}]
+                                config: [{type: FieldType.TEXT, placeholder: 'Введите заголовок сделки'}]
                             },
                             {
                                 label: 'Описание сделки',
@@ -579,7 +796,15 @@ export class FieldCustomizerService {
                                 isOneOff: true,
                                 editable: false,
                                 removable: false,
-                                config: [{type: FieldType.TEXT, label: 'Текстовое поле', placeholder: 'Введите описание сделки'},]
+                                config: [{type: FieldType.TEXT, placeholder: 'Введите описание сделки'},]
+                            },
+                            {
+                                label: 'Комплектация объекта',
+                                code: 'equipment',
+                                isOneOff: true,
+                                editable: false,
+                                removable: false,
+                                config: [{type: FieldType.TEXT, placeholder: 'Введите комплектацию объекта'}]
                             },
                             {
                                 label: 'Квалификация',
@@ -587,7 +812,7 @@ export class FieldCustomizerService {
                                 isOneOff: true,
                                 editable: false,
                                 removable: false,
-                                config: [{ type: FieldType.CHOICE, label: 'Выбор значения', options: FieldCustomizerService.qualificationArray }]
+                                config: [{ type: FieldType.CHOICE, options: FieldCustomizerService.qualificationArray }]
                             },
                             {
                                 label: 'Стадия / Статус',
@@ -595,7 +820,7 @@ export class FieldCustomizerService {
                                 isOneOff: true,
                                 editable: false,
                                 removable: false,
-                                config: [{ type: FieldType.DEPENDED_CHOICE, label: 'Выбор значения', options: FieldCustomizerService.stageOptions, dependedField: 'deal' }]
+                                config: [{ type: FieldType.DEPENDED_CHOICE, options: FieldCustomizerService.stageOptions, dependedField: 'deal', group: true }]
                             },
                             {
                                 label: 'Теги',
@@ -603,7 +828,7 @@ export class FieldCustomizerService {
                                 isOneOff: true,
                                 editable: false,
                                 removable: false,
-                                config: [{ type: FieldType.TAGS, label: 'Выбор тега'}]
+                                config: [{ type: FieldType.TAGS}]
                             },
                             {
                                 label: 'Дополнительно',
@@ -611,12 +836,12 @@ export class FieldCustomizerService {
                                 isOneOff: true,
                                 editable: false,
                                 removable: true,
-                                config: [{type: FieldType.TEXTAREA, label: 'Дополнительно', placeholder: 'Введите дополнительное описание'}]
+                                config: [{type: FieldType.TEXTAREA, placeholder: 'Введите дополнительное описание'}]
                             }
                         ]
                     },
                 ACTIVITY: {
-                    label: 'Активность', subgroups: {}, fields: [
+                    label: 'Активность', fields: [
                         {
                             label: 'Старт активности',
                             code: 'activityStart',
@@ -624,8 +849,8 @@ export class FieldCustomizerService {
                             editable: false,
                             removable: false,
                             config: [
-                                {type: FieldType.DATE, label: 'Выбор даты', placeholder: 'Выберите дату старта активности'},
-                                {type: FieldType.CHOICE, label: 'Выбор значения (Гант)', options: FieldCustomizerService.qualificationArray},
+                                {type: FieldType.DATE, placeholder: 'Выберите дату старта активности'},
+                                {type: FieldType.CHOICE, options: FieldCustomizerService.qualificationArray},
                             ]
                         },
                         {
@@ -634,7 +859,7 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.AUTO, label: 'Автоматическое заполнение', placeholder: '01 декабря 2021'}]
+                            config: [{type: FieldType.AUTO, placeholder: '01 декабря 2021'}]
                         },
                         {
                             label: 'Последний контакт',
@@ -642,7 +867,7 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.AUTO, label: 'Автоматическое заполнение', placeholder: '01 декабря 2021'}]
+                            config: [{type: FieldType.AUTO, placeholder: '01 декабря 2021'}]
                         },
                         {
                             label: 'Последняя активность',
@@ -650,7 +875,7 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.AUTO, label: 'Автоматическое заполнение', placeholder: '01 декабря 2021'}]
+                            config: [{type: FieldType.AUTO, placeholder: '01 декабря 2021'}]
                         },
                         {
                             label: 'Следующая активность',
@@ -658,7 +883,7 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.AUTO, label: 'Автоматическое заполнение', placeholder: '01 декабря 2021'}]
+                            config: [{type: FieldType.AUTO, placeholder: '01 декабря 2021'}]
                         },
                         {
                             label: 'Последняя презентация',
@@ -666,7 +891,7 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.AUTO, label: 'Автоматическое заполнение', placeholder: '01 декабря 2021'}]
+                            config: [{type: FieldType.AUTO, placeholder: '01 декабря 2021'}]
                         },
                         {
                             label: 'Следующай презентация',
@@ -674,7 +899,7 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.AUTO, label: 'Автоматическое заполнение', placeholder: '01 декабря 2021'}]
+                            config: [{type: FieldType.AUTO, placeholder: '01 декабря 2021'}]
                         },
                         {
                             label: 'Последняя маркетинговая компания',
@@ -682,7 +907,7 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.AUTO, label: 'Автоматическое заполнение', placeholder: '01 декабря 2021'}]
+                            config: [{type: FieldType.AUTO, placeholder: '01 декабря 2021'}]
                         },
                         {
                             label: 'Следующая маркетинговая компания',
@@ -690,7 +915,7 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.AUTO, label: 'Автоматическое заполнение', placeholder: '01 декабря 2021'}]
+                            config: [{type: FieldType.AUTO, placeholder: '01 декабря 2021'}]
                         },
                         {
                             label: 'Последняя рекламная компания',
@@ -698,7 +923,7 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.AUTO, label: 'Автоматическое заполнение', placeholder: '01 декабря 2021'}]
+                            config: [{type: FieldType.AUTO, placeholder: '01 декабря 2021'}]
                         },
                         {
                             label: 'Следующая рекламная компания',
@@ -706,7 +931,7 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.AUTO, label: 'Автоматическое заполнение', placeholder: '01 декабря 2021'}]
+                            config: [{type: FieldType.AUTO, placeholder: '01 декабря 2021'}]
                         },
                         {
                             label: 'Следующий шаг',
@@ -715,8 +940,8 @@ export class FieldCustomizerService {
                             editable: false,
                             removable: false,
                             config: [
-                                {type: FieldType.AUTO, label: 'Автоматическое заполнение', placeholder: '01 декабря 2021'},
-                                {type: FieldType.TEXT, label: 'Текстовое поле', placeholder: 'Введите заголовок сделки'}
+                                {type: FieldType.AUTO, placeholder: '01 декабря 2021'},
+                                {type: FieldType.TEXT, placeholder: 'Введите заголовок сделки'}
                             ]
                         },
                         {
@@ -725,41 +950,19 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.TEXTAREA, label: 'Дополнительно', placeholder: 'Введите дополнительное описание'}]
+                            config: [{type: FieldType.TEXTAREA, placeholder: 'Введите дополнительное описание'}]
                         },
                     ]
                 },
-                SUM:{
-                    label: 'Сумма', subgroups: {}, fields: [
+                PRISING:{
+                    label: 'Ценообразование', fields: [
                         {
-                            label: 'Кадастровая стоимость',
-                            code: 'cadastralCost',
+                            label: 'Предварительная сумма сделки',
+                            code: 'previsionalAmount',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.NUMBER, label: 'Числовое значение', placeholder: 'Введите кадастровою стоимость'}]
-                        },
-                        {
-                            label: 'Сумма сделки',
-                            code: 'amount',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: [
-                                {type: FieldType.NUMBER, label: 'Числовое значение', placeholder: 'Введите сумму сделки'},
-                                {type: FieldType.RANGE, label: 'Диапазон значений', placeholder: 'Введите сумму сделки'},
-                            ]
-                        },
-                        {
-                            label: 'Рекомендованная сумма сделки',
-                            code: 'recommendedAmount',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: [
-                                {type: FieldType.NUMBER, label: 'Числовое значение', placeholder: 'Введите рекомендуемую сумму сделки'},
-                                {type: FieldType.RANGE, label: 'Диапазон значений', placeholder: 'Введите рекомендуемую сумму сделки'},
-                            ]
+                            config: [{type: FieldType.NUMBER, placeholder: 'Введите предварительную сумму сделки'}]
                         },
                         {
                             label: 'Взвешенная сумма сделки',
@@ -767,10 +970,31 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [
-                                {type: FieldType.NUMBER, label: 'Числовое значение', placeholder: 'Введите взвешанную сумму сделки'},
-                                {type: FieldType.RANGE, label: 'Диапазон значений', placeholder: 'Введите взвешанную сумму сделки'},
-                            ]
+                            config: [{type: FieldType.NUMBER, placeholder: 'Введите взвешанную сумму сделки'}]
+                        },
+                        {
+                            label: 'Утвержденная сумма сделки',
+                            code: 'approvedAmount',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [{type: FieldType.NUMBER, placeholder: 'Введите скорректированную сумму сделки'}]
+                        },
+                        {
+                            label: 'Фактическая сумма сделки',
+                            code: 'factAmount',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [{type: FieldType.NUMBER, placeholder: 'Введите фактическую сумму сделки'}]
+                        },
+                        {
+                            label: 'Кадастровая стоимость',
+                            code: 'cadastralCost',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [{type: FieldType.NUMBER, placeholder: 'Введите кадастровою стоимость'}]
                         },
                         {
                             label: 'Оценочная стоимость',
@@ -778,23 +1002,15 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.NUMBER, label: 'Числовое значение', placeholder: 'Введите оценочную стоимость'}]
+                            config: [{type: FieldType.NUMBER, placeholder: 'Введите оценочную стоимость'}]
                         },
                         {
-                            label: 'Фактическая сумма сделки',
-                            code: 'actualAmount',
+                            label: 'Дополнительные платежи',
+                            code: 'additionalPayments',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.NUMBER, label: 'Числовое значение', placeholder: 'Введите фактическую сумму сделки'}]
-                        },
-                        {
-                            label: 'MLS',
-                            code: 'mls',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: [{ type: FieldType.NUMBER, label: 'Числовое значение', placeholder: 'Введите сумму mls'}]
+                            config: [{type: FieldType.TEXTAREA, placeholder: 'Введите дополнительные платежи'}]
                         },
                         {
                             label: 'Комиссия',
@@ -802,18 +1018,16 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [{type: FieldType.NUMBER, label: 'Числовое значение', placeholder: 'Введите сумму комиссии'}]
+                            config: [{type: FieldType.NUMBER, placeholder: 'Введите сумму комиссии'}]
                         },
                         {
-                            label: 'Статус комиссии',
-                            code: 'commissionStatus',
+                            label: 'Дополнительно',
+                            code: 'descriptionPrising',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: [
-                                {type: FieldType.CHOICE, label: 'Выбор значения', options: FieldCustomizerService.commissionStatus },
-                                {type: FieldType.TEXT, label: 'Текстовое поле', placeholder: 'Введите статус коммисии'}]
-                        },
+                            config: [{type: FieldType.TEXTAREA, placeholder: 'Введите дополнительное описание'}]
+                        }
                     ]
                 }
             }
@@ -821,14 +1035,67 @@ export class FieldCustomizerService {
         OBJECT: {
             label: 'Объект', groups: {
                 'mainDescription': {
-                    label: 'Общее описание', subgroups: {}, fields: [
+                    label: 'Общее описание', fields: [
                         {
                             label: 'Объект сделки',
                             code: 'objectType',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [{type: FieldType.CHOICE, options: FieldCustomizerService.objectTypes, group: true}]
+                        },
+                        {
+                            label: 'Количество комнат',
+                            code: 'roomsCount',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.INLINE_CHOICE,
+                                    placeholder: 'Введите количество комнат',
+                                    options: FieldCustomizerService.roomCountArray,
+                                    postfix: (value: any) => value == 0 ? '' : "- комнатная(ый)"
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Описание помещений',
+                            code: 'roomsDescription',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [{type: FieldType.NUMBER, placeholder: 'Введите описание помещений'}]
+                        },
+                        {
+                            label: 'Планировка помещений',
+                            code: 'planning',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {type: FieldType.DEPENDED_CHOICE, options: FieldCustomizerService.plannings, dependedField: 'objectType', editable: true},
+                                {type: FieldType.TEXT, placeholder: 'Введите планировочное решение'}
+                            ]
+                        },
+                        {
+                            label: 'Отделка помещений',
+                            code: 'decoration',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {type: FieldType.CHOICE, options: FieldCustomizerService.decorations},
+                                {type: FieldType.MULTI_CHOICE, options: FieldCustomizerService.decorations},
+                            ]
+                        },
+                        {
+                            label: 'Площадь',
+                            code: 'squareRoom',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [{type: FieldType.TEXT, placeholder: 'Введите площадь помещения'}]
                         },
                         {
                             label: 'Этаж объекта сделки',
@@ -836,171 +1103,47 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [{type: FieldType.TEXT, placeholder: 'Введите этаж объекта'}]
                         },
                         {
-                            label: 'Этажей объекта сделки',
-                            code: 'floors',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Уровней объекта сделки',
-                            code: 'levels',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Антресоль',
-                            code: 'entresol',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Этажность здания',
-                            code: 'totalFloors',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Надземные этажи',
-                            code: 'overgroundFloors',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Подземные этажи',
-                            code: 'undergroundFloors',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-
-                        {
-                            label: 'Площадь объекта сделки',
-                            code: 'squareObject',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Площадь квартиры',
-                            code: 'squareApartment',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Площадь индивидуального жилого дома',
-                            code: 'squareHouse',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Площадь земельного участка',
-                            code: 'squareLand',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-
-                        {
-                            label: 'Санузел объекта сделки',
+                            label: 'Санузел',
                             code: 'bathroomObject',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [{type: FieldType.TEXT, placeholder: 'Введите планировочное решение'}]
                         },
                         {
-                            label: 'Санузел квартиры',
-                            code: 'bathroomApartment',
+                            label: 'Встроенные и примыкающи помещения',
+                            code: 'extraRooms',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [{type: FieldType.TEXT, placeholder: 'Введите планировочное решение'}]
                         },
                         {
-                            label: 'Санузел индивидуального жилого дома',
-                            code: 'bathroomHouse',
+                            label: 'Высота потолка',
+                            code: 'ceilingHeight',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [{type: FieldType.TEXT, placeholder: 'Введите планировочное решение'}]
                         },
                         {
-                            label: 'Санузел в здании',
-                            code: 'bathroomHouse',
+                            label: 'Окна',
+                            code: 'windows',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
-                        },
-
-                        {
-                            label: 'Отделка объекта сделки',
-                            code: 'decorationObject',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
+                            config: [{type: FieldType.TEXT, placeholder: 'Введите планировочное решение'}]
                         },
                         {
-                            label: 'Отделка помещений объекта сделки',
-                            code: 'decorationApartment',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Отделка помещений квартиры',
-                            code: 'decorationApartment',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Отделка помещений индивидуального жилого дома',
-                            code: 'decorationHouse',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Отделка помещений садового дома',
-                            code: 'decorationLand',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-
-                        {
-                            label: 'Кадастровый номер объекта сделки',
+                            label: 'Кадастровый номер',
                             code: 'cadastralNumber',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [{type: FieldType.TEXT, placeholder: 'Введите планировочное решение'}]
                         },
                         {
                             label: 'Дополнительно',
@@ -1008,379 +1151,51 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [{type: FieldType.TEXT, placeholder: 'Введите планировочное решение'}]
                         }
                     ]
                 },
-                'roomsDescription': {
-                    label: 'Описание помещений', fields: [], subgroups: {
-                        LIVING: {
-                            label: 'Жилые помещения', fields: [
-                                {
-                                    label: 'Количество комнат/помещений',
-                                    code: 'roomsCount',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Отделка помещений',
-                                    code: 'decoration',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Планировочное решение',
-                                    code: 'planning',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Площадь помещений',
-                                    code: 'squareRoom',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Высота потолка',
-                                    code: 'ceilingHeight',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Окна',
-                                    code: 'windows',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Дополнительно',
-                                    code: 'additional',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                }
-                            ]
-                        },
-                        AUXILIARY: {
-                            label: 'Вспомогательные помещения', fields: [
-                                {
-                                    label: 'Кухня',
-                                    code: 'kitchen',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Кухня-ниша',
-                                    code: 'mini-kitchen',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Кухня-столовая',
-                                    code: 'kitchen-dining',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Кухня-гостиная',
-                                    code: 'living-kitchen',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Холл',
-                                    code: 'hall',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Передняя (прихожая)',
-                                    code: 'hallway',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Ванная комната',
-                                    code: 'bathroom',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Душевая комната',
-                                    code: 'shower-room',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Туалетная комната',
-                                    code: 'toilet',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Совмещеннй санузел',
-                                    code: 'wc1',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Уборная',
-                                    code: 'wc',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Кладовая',
-                                    code: 'pantry',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Кабинет',
-                                    code: 'cabinet',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Библиотека',
-                                    code: 'library',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Гардеробная',
-                                    code: 'wardrobe',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                }
-                            ]
-                        },
-                        EXTRA_ROOMS: {
-                            label: 'Встроенные и примыкающие пом.', fields: [
-                                {
-                                    label: 'Балкон',
-                                    code: 'balcony',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Лоджия',
-                                    code: 'loggia',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Веранда',
-                                    code: 'veranda',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Терраса',
-                                    code: 'terrace',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Эксплуатируемая кровля',
-                                    code: 'roof',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                },
-                                {
-                                    label: 'Эркер',
-                                    code: 'oriel',
-                                    isOneOff: true,
-                                    editable: false,
-                                    removable: false,
-                                    config: []
-                                }
-                            ]
-                        }
-                    }
-                },
                 'buildingDescription': {
-                    label: 'Описание здания', subgroups: {}, fields: [
+                    label: 'Описание здания', fields: [
                         {
-                            label: 'Тип здания',
+                            label: 'Тип дома',
                             code: 'houseType',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: FieldCustomizerService.houseType,
+                                    group: true
+                                }
+                            ]
                         },
                         {
-                            label: 'Класс здания',
-                            code: 'houseClass',
+                            label: 'Статус здания',
+                            code: 'houseStatus',
                             isOneOff: true,
-                            editable: false,
+                            editable: true,
                             removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
                         },
                         {
-                            label: 'Тип индивидуального жилого дома',
-                            code: 'houseKind',
+                            label: 'Название здания, жилого комплекса',
+                            code: 'houseName',
                             isOneOff: true,
-                            editable: false,
+                            editable: true,
                             removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Стиль индивидуального жилого дома',
-                            code: 'houseStyle',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Календарь готовности дома',
-                            code: 'readyDate',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Выдача ключей до',
-                            code: 'keysIssuanceDate',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Обеспечение обязательств застройщика',
-                            code: 'developerObligations',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Материал и тип стен дома',
-                            code: 'wallType',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Материал и тип перекрытий',
-                            code: 'floorType',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Материал и тип фундамента',
-                            code: 'foundationType',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Помещений на этаже',
-                            code: 'spacesFloor',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Квартир на этаже',
-                            code: 'apartmentsFloor',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Комнат на этаже',
-                            code: 'roomsFloor',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Секций на этаже',
-                            code: 'sectionsFloor',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Квартир в секции',
-                            code: 'apartmentsSection',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Комнат в секции',
-                            code: 'roomsSection',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.TEXT,
+                                    placeholder: 'Введите название здания/жилого комплекс'
+                                }
+                            ]
                         },
                         {
                             label: 'Класс энергоэффективности здания',
@@ -1388,103 +1203,192 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
                         },
                         {
-                            label: 'Дополнительно',
-                            code: 'additional',
+                            label: 'Класс недвижимости',
+                            code: 'houseClass',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
-                        }
-                    ]
-                },
-                'engineering': {
-                    label: 'Инженерия', subgroups: {}, fields: [
-                        {
-                            label: 'Электроснабжение',
-                            code: 'electricity',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
                         },
                         {
-                            label: 'Водоснабжение',
-                            code: 'water',
+                            label: 'Календарь готовности дома',
+                            code: 'readyDate',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.DATE, placeholder: 'Выберите дату'
+                                }
+                            ]
                         },
                         {
-                            label: 'Газоснабжение',
-                            code: 'gas',
+                            label: 'Выдача ключей до',
+                            code: 'keysDate',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.DATE, placeholder: 'Выберите дату'
+                                }
+                            ]
                         },
                         {
-                            label: 'Канализация',
-                            code: 'sewerage',
+                            label: 'Обеспечение обязательств застройщика',
+                            code: 'developerEnsuring',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.TEXT,
+                                    placeholder: 'Введите класс недвижимости'
+                                }
+                            ]
                         },
                         {
-                            label: 'Отопление',
-                            code: 'heating',
+                            label: 'Архитектурный стиль',
+                            code: 'houseStyle',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
                         },
                         {
-                            label: 'Вентиляция',
-                            code: 'ventilation',
+                            label: 'Этажность здания',
+                            code: 'totalFloors',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.NUMBER,
+                                    placeholder: 'Введите количество этажей'
+                                }
+                            ]
                         },
                         {
-                            label: 'Кондиционирование',
-                            code: 'conditioning',
+                            label: 'Описание этажей',
+                            code: 'floorsDescription',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.TEXTAREA,
+                                    placeholder: 'Введите описание этажей'
+                                }
+                            ]
                         },
                         {
-                            label: 'Климат-контроль',
-                            code: 'climateControl',
+                            label: 'Количество подъездов',
+                            code: 'entrancesCount',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.NUMBER,
+                                    placeholder: 'Введите количество подъездов'
+                                }
+                            ]
                         },
                         {
-                            label: 'Дополнительно',
-                            code: 'additional',
+                            label: 'Количество квартир в доме',
+                            code: 'apartmentsInHouse',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
-                        }
-                    ]
-                },
-                'houseService': {
-                    label: 'Сервис в здании', subgroups: {}, fields: [
+                            config: [
+                                {
+                                    type: FieldType.NUMBER,
+                                    placeholder: 'Введите количество квартир в доме'
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Среднее количество квартир на этаже',
+                            code: 'roomsInFloor',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.NUMBER,
+                                    placeholder: 'Введите количество квартир на этаже'
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Материал и тип стен дома',
+                            code: 'wallType',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Материал и тип перекрытий',
+                            code: 'floorType',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Тип фундамента',
+                            code: 'foundationType',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
+                        },
                         {
                             label: 'Комфорт в здании',
                             code: 'comfort',
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
                         },
                         {
                             label: 'Безопасность',
@@ -1492,7 +1396,12 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
                         },
                         {
                             label: 'Безбарьерная среда',
@@ -1500,15 +1409,12 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
-                        },
-                        {
-                            label: 'Парковочное пространство',
-                            code: 'parking',
-                            isOneOff: true,
-                            editable: false,
-                            removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
                         },
                         {
                             label: 'Обустройство двора',
@@ -1516,12 +1422,30 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: false,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Дополнительно',
+                            code: 'additional',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.TEXTAREA,
+                                    placeholder: "Введите дополнительное описание"
+                                }
+                            ]
                         }
                     ]
                 },
                 'landDescription': {
-                    label: 'Описание земельного участка', subgroups: {}, fields: [
+                    label: 'Описание земельного участка', fields: [
                         {
                             label: 'Тип земельного участка',
                             code: 'landType',
@@ -1531,27 +1455,11 @@ export class FieldCustomizerService {
                             config: [
                                 {
                                     type: FieldType.CHOICE,
-                                    label: 'Выбор значения',
                                     options: FieldCustomizerService.landTypeOptions
                                 },
                                 {
                                     type: FieldType.TEXT,
-                                    label: 'Текстовое поле',
                                     placeholder: 'Введите тип земельного участка'
-                                }
-                            ]
-                        },
-                        {
-                            label: 'Кадастровый номер',
-                            code: 'landCadastral',
-                            isOneOff: true,
-                            editable: true,
-                            removable: true,
-                            config: [
-                                {
-                                    type: FieldType.TEXT,
-                                    label: 'Текстовое поле',
-                                    placeholder: 'Введите кадастровый номер'
                                 }
                             ]
                         },
@@ -1564,10 +1472,9 @@ export class FieldCustomizerService {
                             config: [
                                 {
                                     type: FieldType.CHOICE,
-                                    label: 'Выбор значения',
                                     options: FieldCustomizerService.categoryLandOptions
                                 },
-                                {type: FieldType.TEXT, label: 'Текстовое поле', placeholder: 'Введите категорию земель'}
+                                {type: FieldType.TEXT, placeholder: 'Введите категорию земель'}
                             ]
                         },
                         {
@@ -1579,12 +1486,10 @@ export class FieldCustomizerService {
                             config: [
                                 {
                                     type: FieldType.CHOICE,
-                                    label: 'Выбор значения',
                                     options: FieldCustomizerService.usingLandOptions
                                 },
                                 {
                                     type: FieldType.TEXT,
-                                    label: 'Текстовое поле',
                                     placeholder: 'Введите вид разрешенного использования'
                                 }
                             ]
@@ -1598,12 +1503,10 @@ export class FieldCustomizerService {
                             config: [
                                 {
                                     type: FieldType.CHOICE,
-                                    label: 'Выбор значения',
                                     options: FieldCustomizerService.statusLandOptions
                                 },
                                 {
                                     type: FieldType.TEXT,
-                                    label: 'Текстовое поле',
                                     placeholder: 'Введите статус земельного участка'
                                 }
                             ]
@@ -1612,13 +1515,7 @@ export class FieldCustomizerService {
                             label: 'Сообщество', code: 'community', isOneOff: true, editable: true, removable: false,
                             config: [
                                 {
-                                    type: FieldType.CHOICE,
-                                    label: 'Выбор значения',
-                                    options: FieldCustomizerService.communityOptions
-                                },
-                                {
                                     type: FieldType.TEXT,
-                                    label: 'Текстовое поле',
                                     placeholder: 'Введите название сообщества'
                                 }
                             ]
@@ -1629,17 +1526,187 @@ export class FieldCustomizerService {
                             isOneOff: true,
                             editable: false,
                             removable: true,
-                            config: []
+                            config: [
+                                {
+                                    type: FieldType.TEXTAREA,
+                                    placeholder: "Введите дополнительное описание"
+                                }
+                            ]
                         }
                     ]
                 },
+                'engineering': {
+                    label: 'Инженерия', fields: [
+                        {
+                            label: 'Электроснабжение',
+                            code: 'electricity',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                },
+                            ]
+                        },
+                        {
+                            label: 'Водоснабжение',
+                            code: 'water',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Газоснабжение',
+                            code: 'gas',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Канализация',
+                            code: 'sewerage',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Отопление',
+                            code: 'heating',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Вентиляция',
+                            code: 'ventilation',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Кондиционирование',
+                            code: 'conditioning',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Климат-контроль',
+                            code: 'climateControl',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.CHOICE,
+                                    options: []
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Дополнительно',
+                            code: 'additional',
+                            isOneOff: true,
+                            editable: false,
+                            removable: false,
+                            config: [
+                                {
+                                    type: FieldType.TEXTAREA,
+                                    placeholder: "Введите дополнительное описание"
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
         },
-        GEOLOCATION: {label: 'Геолокация', groups: {}},
+        GEOLOCATION: {label: 'Геолокация', groups: {
+                'location': { label: 'Местоположение', fields: [
+                        {
+                            label: 'Описание поиска',
+                            code: 'searchDescription',
+                            isOneOff: true,
+                            editable: false,
+                            removable: true,
+                            config: [
+                                {
+                                    type: FieldType.TEXTAREA,
+                                    placeholder: "Введите описание поиска"
+                                }
+                            ]
+                        },
+                        {
+                            label: 'Дополнительно',
+                            code: 'additional',
+                            isOneOff: true,
+                            editable: false,
+                            removable: true,
+                            config: [
+                                {
+                                    type: FieldType.TEXTAREA,
+                                    placeholder: "Введите дополнительное описание"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
     }
 
+    private template: SelectedField;
 
-    constructor() { }
+    public getTemplate(): SelectedField{
+        return this.template;
+    }
+
+    constructor() {
+        this.template = {};
+        for(let section in FieldCustomizerService.DEAL_FIELDS){
+            this.template[section] = {};
+            for(let group in FieldCustomizerService.DEAL_FIELDS[section].groups){
+                this.template[section][group] = [...FieldCustomizerService.DEAL_FIELDS[section].groups[group].fields];
+            }
+        }
+    }
 
     public getAllFields(): Sections{
         return FieldCustomizerService.DEAL_FIELDS;

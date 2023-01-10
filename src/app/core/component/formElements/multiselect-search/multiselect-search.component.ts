@@ -9,11 +9,11 @@ export interface IParams {
 }
 
 @Component({
-    selector: 'app-multiselect',
-    templateUrl: './multiselect.component.html',
-    styleUrls: ['./multiselect.component.scss']
+    selector: 'app-multiselect-search',
+    templateUrl: './multiselect-search.component.html',
+    styleUrls: ['./multiselect-search.component.scss']
 })
-export class MultiselectComponent implements OnInit {
+export class MultiselectSearchComponent implements OnInit {
     @Input() params: IParams[] = [];
     @Input() label: string = '';
     @Input() selectedData: any[] = [];

@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MultiselectSearchComponent } from './multiselect-search.component';
+import { DropdownFormComponent } from './dropdown-form.component';
 
-describe('MultiselectSearchComponent', () => {
-  let component: MultiselectSearchComponent;
-  let fixture: ComponentFixture<MultiselectSearchComponent>;
+describe('DropdownFormComponent', () => {
+  let component: DropdownFormComponent;
+  let fixture: ComponentFixture<DropdownFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MultiselectSearchComponent ]
+      declarations: [ DropdownFormComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MultiselectSearchComponent);
+    fixture = TestBed.createComponent(DropdownFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

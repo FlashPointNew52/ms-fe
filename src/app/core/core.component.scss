@@ -173,13 +173,13 @@
 
         .p-radiobutton {
             position: relative;
-            width: 14px;
+            width: 12px;
 
             .p-radiobutton-box {
-                border: 1px solid $color-blue-light1;
+                border: 1px solid $color-blue-light0;
                 background: #ffffff;
-                width: 14px;
-                height: 14px;
+                width: 12px;
+                height: 12px;
                 border-radius: 50%;
                 transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
 

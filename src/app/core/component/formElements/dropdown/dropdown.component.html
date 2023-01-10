@@ -2,6 +2,7 @@
             [scrollHeight]="scrollHeight" optionLabel="label" [optionValue]="optionValue"
             (onChange)="change($event)" [group]="group" [appendTo]="appendTo"
             [panelStyleClass]="'dropdown-panel' + (dropdown._filterValue && dropdown._filterValue.length > 0 ? ' withoutSearch' : '')"
+            [editable]="editable"
 >
     <ng-template let-val pTemplate="selectedItem">
         <div>{{(usePrefix ? placeholder + ': ' : '') + (onlyDropdown ? placeholder : val.label)}}</div>
